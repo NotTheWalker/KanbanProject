@@ -1,36 +1,102 @@
 package src;
 
-import java.util.regex.*;
+import javax.swing.*;
+import java.util.Arrays;
+import java.util.logging.Logger;
+
+import static javax.swing.JOptionPane.*;
 
 public class Login {
 
+    Logger logger = Logger.getLogger(Login.class.getName());
+    private final String[] SUCCESS_OPTIONS = {"Continue", "Exit"};
+    private final String[] FAILURE_OPTIONS = {"Try Again", "Exit"};
+    private User user;
+    private String response;
 
-    public boolean checkUserName(User user) {
-        boolean lessThan5 = user.getUserName().length()<=5;
-        boolean containsUnderscore = user.getUserName().contains("_");
-        return lessThan5 && containsUnderscore;
-    }
-    public boolean checkPasswordComplexity(User user) {
-
-        Pattern patternCapital = Pattern.compile("[A-Z]");
-        Matcher matcherCapital = patternCapital.matcher(user.getPassword());
-
-        Pattern patternNumber = Pattern.compile("[0-9]");
-        Matcher matcherNumber = patternNumber.matcher(user.getPassword());
-
-        Pattern patternSpecial = Pattern.compile("[^a-zA-Z\\d\\s:]");
-        Matcher matcherSpecial = patternSpecial.matcher(user.getPassword());
-
-        boolean moreThan8 = user.getPassword().length()>=8;
-        boolean containsCapital = matcherCapital.find();
-        boolean containsNumber = matcherNumber.find();
-        boolean containsSpecial = matcherSpecial.find();
-        return moreThan8 && containsCapital && containsNumber && containsSpecial;
+    public User getUser() {
+        return user;
     }
 
-    public String registerUser(User user) {
-        boolean goodUsername = checkUserName(user);
-        boolean goodPassword = checkPasswordComplexity(user);
+    public Login() {
+    }
+
+    public User login() {
+        user.setUserName(showInputDialog("Please enter your username"));
+        user.setPassword(showInputDialog("Please enter your password"));
+        User referenceUser = new User();
+        referenceUser.setUserName("test_user");
+        referenceUser.setPassword("TestPassword1!");
+        if(loginUser(user, referenceUser)) {
+            return referenceUser;
+        } else {
+            return null;
+        }
+    }
+
+    public int register() {
+        User providedUser = new User("foo", "bar");
+        int selected = 0;
+        JTextField userField = new JTextField();
+        JPasswordField passwordField = new JPasswordField();
+        JTextField firstNameField = new JTextField();
+        JTextField lastNameField = new JTextField();
+        String registerPrompt = "Please enter your username and password";
+        String detailsPrompt = "Please enter your first and last name";
+        while (true) {
+            Object[] registerMessage = {
+                    registerPrompt, "Username:", userField,
+                    "Password:", passwordField
+            };
+            selected = showOptionDialog(
+                    null, registerMessage, "Register",
+                    OK_CANCEL_OPTION, PLAIN_MESSAGE,
+                    null, null, null);
+            logger.info("Register pane: "+selected);
+
+            if(selected==2) {break;}
+
+            providedUser.setUserName(userField.getText());
+            providedUser.setPassword(Arrays.toString(passwordField.getPassword()));
+            this.user = providedUser;
+            response = registerResponse(user);
+
+            if(user.checkUserName() && user.checkPasswordComplexity()) {
+                Object[] detailsMessage = {
+                        detailsPrompt, "First name:", firstNameField,
+                        "Last name:", lastNameField
+                };
+                selected = showOptionDialog(
+                        null, detailsMessage, "Register",
+                        YES_NO_OPTION, PLAIN_MESSAGE,
+                        null, null, null);
+                logger.info("Details pane: "+selected);
+                if(selected==0) {
+                    user.setFirstName(firstNameField.getText());
+                    user.setLastName(lastNameField.getText());
+                }
+                selected = showOptionDialog(
+                        null, response, "Registration Successful",
+                        DEFAULT_OPTION, QUESTION_MESSAGE,
+                        null, SUCCESS_OPTIONS, SUCCESS_OPTIONS[0]);
+                logger.info("Success pane: "+selected);
+                break;
+            } else {
+                selected = showOptionDialog(
+                        null, response, "Registration Failed",
+                        DEFAULT_OPTION, QUESTION_MESSAGE,
+                        null, FAILURE_OPTIONS, FAILURE_OPTIONS[0]);
+                logger.info("Failure pane: "+selected);
+                if(selected==2) {break;}
+            }
+        }
+        return selected;
+    }
+
+
+    public String registerResponse(User user) {
+        boolean goodUsername = user.checkUserName();
+        boolean goodPassword = user.checkPasswordComplexity();
         String response = "";
         if(goodUsername) {
             response += "Username successfully captured";

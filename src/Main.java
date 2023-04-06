@@ -1,19 +1,52 @@
 package src;
 
-// Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
-// then press Enter. You can now see whitespace characters in your code.
+import javax.swing.*;
+
 public class Main {
     public static void main(String[] args) {
-        // Press Alt+Enter with your caret at the highlighted text to see how
-        // IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
-
-        // Press Shift+F10 or click the green arrow button in the gutter to run the code.
-        for (int i = 1; i <= 5; i++) {
-
-            // Press Shift+F9 to start debugging your code. We have set one breakpoint
-            // for you, but you can always add more by pressing Ctrl+F8.
-            System.out.println("i = " + i);
+        boolean endProgram = false;
+        boolean continueFlag=false;
+        String[] options = {"Login", "Register", "Exit"};
+        User[] allUsers = new User[0];
+        while (!endProgram) {
+            int selected = JOptionPane.showOptionDialog(
+                    null,
+                    "Please select an option",
+                    "Login/Register",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.INFORMATION_MESSAGE,
+                    null, options, options[0]);
+            switch (selected) {
+                case 0:
+                    Login login = new Login();
+                    User user = login.login();
+                    for (User allUser : allUsers) {
+                        if (allUser.equals(user)) {
+                            JOptionPane.showMessageDialog(null, "Welcome " + allUser.getFirstName() + " " + allUser.getLastName() + " it is great to see you again.");
+                            continueFlag = true;
+                            break;
+                        }
+                    }
+                    break;
+                case 1:
+                    Login register = new Login();
+                    int registerCode = register.register();
+                    System.out.println(register.getUser().toString());
+                    break;
+                case 2:
+                    endProgram = true;
+                    break;
+            }
+            if(continueFlag){
+                continueFlag=false;
+                continue;
+            }
         }
+    }
+    public static User[] addUser(User[] allUsers, User newUser) {
+        User[] newAllUsers = new User[allUsers.length + 1];
+        System.arraycopy(allUsers, 0, newAllUsers, 0, allUsers.length);
+        newAllUsers[newAllUsers.length - 1] = newUser;
+        return newAllUsers;
     }
 }
