@@ -1,11 +1,13 @@
 package src;
 
 import java.util.Objects;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class User {
 
+    Logger logger = Logger.getLogger(User.class.getName());
     Pattern PATTERN_CAPITAL = Pattern.compile("[A-Z]");
     Pattern PATTERN_NUMBER = Pattern.compile("[0-9]");
     Pattern PATTERN_SPECIAL = Pattern.compile("[^a-zA-Z\\d\\s:]");
@@ -15,7 +17,7 @@ public class User {
     private String firstName = null;
     private String lastName = null;
 
-    public User(String userName, String password, String firstName, String lastName) {
+    public User(String userName, String password, String firstName, String lastName) { //TODO: is this constructor necessary?
         this.userName = userName;
         this.password = password;
         this.firstName = firstName;
@@ -28,10 +30,10 @@ public class User {
     }
 
     public User() {
-
+        //TODO: see above
     }
 
-    public String getUserName() {
+    public String getUserName() {//TODO: Username changing/viewing?
         return userName;
     }
 
@@ -39,7 +41,7 @@ public class User {
         this.userName = userName;
     }
 
-    public String getPassword() {
+    public String getPassword() { //TODO: Is this necessary?
         return password;
     }
 
@@ -99,6 +101,7 @@ public class User {
         boolean containsCapital = matcherCapital.find();
         boolean containsNumber = matcherNumber.find();
         boolean containsSpecial = matcherSpecial.find();
+        logger.info("Password complexity: "+moreThan8+" "+containsCapital+" "+containsNumber+" "+containsSpecial);
         return moreThan8 && containsCapital && containsNumber && containsSpecial;
     }
 }

@@ -1,8 +1,10 @@
 package src;
 
 import javax.swing.*;
+import java.util.logging.Logger;
 
 public class Main {
+    static Logger logger = Logger.getLogger(Main.class.getName());
     public static void main(String[] args) {
         boolean endProgram = false;
         boolean continueFlag=false;
@@ -17,31 +19,37 @@ public class Main {
                     JOptionPane.INFORMATION_MESSAGE,
                     null, options, options[0]);
             switch (selected) {
-                case 0:
+                case 0 -> {
                     Login login = new Login();
-                    User user = login.login();
-                    for (User allUser : allUsers) {
-                        if (allUser.equals(user)) {
-                            JOptionPane.showMessageDialog(null, "Welcome " + allUser.getFirstName() + " " + allUser.getLastName() + " it is great to see you again.");
-                            continueFlag = true;
-                            break;
-                        }
+                    int loginCode = login.loginUser(allUsers);
+                    if (loginCode == 0) {
+                        logger.info("Login successful");
+                    } else {
+                        continueFlag = true;
+                        logger.info("loginCode: " + loginCode);
                     }
-                    break;
-                case 1:
+                    logger.info(login.getUser().toString());
+                }
+                case 1 -> {
                     Login register = new Login();
-                    int registerCode = register.register();
-                    System.out.println(register.getUser().toString());
-                    break;
-                case 2:
-                    endProgram = true;
-                    break;
+                    int registerCode = register.registerUser();
+                    if (registerCode == 0) {
+                        allUsers = addUser(allUsers, register.getUser());
+                    } else {
+                        continueFlag = true;
+                        logger.info("registerCode: " + registerCode);
+                    }
+                    logger.info(register.getUser().toString());
+                }
+                case 2 -> endProgram = true;
             }
             if(continueFlag){
                 continueFlag=false;
                 continue;
             }
         }
+        //TODO: KANBAN BOARD
+        //TODO: ASSOCIATE USERS WITH TASKS
     }
     public static User[] addUser(User[] allUsers, User newUser) {
         User[] newAllUsers = new User[allUsers.length + 1];

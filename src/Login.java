@@ -1,7 +1,6 @@
 package src;
 
 import javax.swing.*;
-import java.util.Arrays;
 import java.util.logging.Logger;
 
 import static javax.swing.JOptionPane.*;
@@ -21,26 +20,68 @@ public class Login {
     public Login() {
     }
 
-    public User login() {
-        user.setUserName(showInputDialog("Please enter your username"));
-        user.setPassword(showInputDialog("Please enter your password"));
-        User referenceUser = new User();
-        referenceUser.setUserName("test_user");
-        referenceUser.setPassword("TestPassword1!");
-        if(loginUser(user, referenceUser)) {
-            return referenceUser;
-        } else {
-            return null;
+    public int loginUser(User[] allUsers) {
+        boolean goodLogin = false;
+
+        User providedUser = new User("foo", "bar");
+        User referenceUser = new User("foo", "bar");
+
+        JTextField userField = new JTextField();
+        JPasswordField passwordField = new JPasswordField();
+
+        String registerPrompt = "Please enter your username and password";
+        while (true) {
+            Object[] registerMessage = {
+                    registerPrompt, "Username:", userField,
+                    "Password:", passwordField
+            };
+            int loginCode = showOptionDialog(
+                    null, registerMessage, "Login",
+                    OK_CANCEL_OPTION, PLAIN_MESSAGE,
+                    null, null, null);
+            logger.info("Login pane: "+loginCode);
+
+            if(loginCode==2) {return loginCode;}
+
+            providedUser.setUserName(userField.getText());
+            providedUser.setPassword(new String(passwordField.getPassword()));
+            this.user = providedUser;
+
+            for(User u: allUsers){
+                logger.info(u.toString());
+                if(u.equals(user)) {
+                    referenceUser = u;
+                    goodLogin = true;
+                    break;
+                }
+            }
+            response = returnLoginStatus(user, referenceUser);
+
+            if (goodLogin) {
+                showMessageDialog(null, response, "Success", PLAIN_MESSAGE);
+                return 0;
+            } else {
+                int failureCode = showOptionDialog(
+                        null, response, "Failure",
+                        YES_NO_OPTION, PLAIN_MESSAGE,
+                        null, FAILURE_OPTIONS, FAILURE_OPTIONS[0]);
+                logger.info("Failure pane: "+failureCode);
+                if (failureCode == 2) {
+                    return failureCode;
+                }
+            }
         }
     }
 
-    public int register() {
+    public int registerUser() {
         User providedUser = new User("foo", "bar");
-        int selected = 0;
+        int registerCode;
+
         JTextField userField = new JTextField();
         JPasswordField passwordField = new JPasswordField();
         JTextField firstNameField = new JTextField();
         JTextField lastNameField = new JTextField();
+
         String registerPrompt = "Please enter your username and password";
         String detailsPrompt = "Please enter your first and last name";
         while (true) {
@@ -48,76 +89,83 @@ public class Login {
                     registerPrompt, "Username:", userField,
                     "Password:", passwordField
             };
-            selected = showOptionDialog(
+            registerCode = showOptionDialog(
                     null, registerMessage, "Register",
                     OK_CANCEL_OPTION, PLAIN_MESSAGE,
                     null, null, null);
-            logger.info("Register pane: "+selected);
+            logger.info("Register pane: "+registerCode);
 
-            if(selected==2) {break;}
+            if(registerCode==2) {break;}
 
             providedUser.setUserName(userField.getText());
-            providedUser.setPassword(Arrays.toString(passwordField.getPassword()));
-            this.user = providedUser;
-            response = registerResponse(user);
+            providedUser.setPassword(new String(passwordField.getPassword()));
+            response = returnRegistrationStatus(providedUser);
 
-            if(user.checkUserName() && user.checkPasswordComplexity()) {
+            if(providedUser.checkUserName() && providedUser.checkPasswordComplexity()) {
                 Object[] detailsMessage = {
                         detailsPrompt, "First name:", firstNameField,
                         "Last name:", lastNameField
                 };
-                selected = showOptionDialog(
+                registerCode = showOptionDialog(
                         null, detailsMessage, "Register",
                         YES_NO_OPTION, PLAIN_MESSAGE,
                         null, null, null);
-                logger.info("Details pane: "+selected);
-                if(selected==0) {
-                    user.setFirstName(firstNameField.getText());
-                    user.setLastName(lastNameField.getText());
+                logger.info("Details pane: "+registerCode);
+                if(registerCode==0) {
+
+                    providedUser.setFirstName(firstNameField.getText());
+                    providedUser.setLastName(lastNameField.getText());
+                    this.user = providedUser;
                 }
-                selected = showOptionDialog(
+                registerCode = showOptionDialog(
                         null, response, "Registration Successful",
                         DEFAULT_OPTION, QUESTION_MESSAGE,
                         null, SUCCESS_OPTIONS, SUCCESS_OPTIONS[0]);
-                logger.info("Success pane: "+selected);
+                logger.info("Success pane: "+registerCode);
                 break;
             } else {
-                selected = showOptionDialog(
+                registerCode = showOptionDialog(
                         null, response, "Registration Failed",
                         DEFAULT_OPTION, QUESTION_MESSAGE,
                         null, FAILURE_OPTIONS, FAILURE_OPTIONS[0]);
-                logger.info("Failure pane: "+selected);
-                if(selected==2) {break;}
+                logger.info("Failure pane: "+registerCode);
+                if(registerCode==2) {break;}
             }
         }
-        return selected;
+        return registerCode;
     }
 
 
-    public String registerResponse(User user) {
+    public String returnRegistrationStatus(User user) {
         boolean goodUsername = user.checkUserName();
         boolean goodPassword = user.checkPasswordComplexity();
         String response = "";
         if(goodUsername) {
             response += "Username successfully captured";
         } else {
-            response += "Username is not correctly formatted, please ensure that your username contains an underscore and is no more than 5 characters in length .";
+            response += """
+                    Username is not correctly formatted,\s
+                    please ensure that your username contains an underscore and\s
+                    is no more than 5 characters in length .""";
         }
         response += "\n";
         if(goodPassword) {
             response += "Password successfully captured";
         } else {
-            response += "Password is not correctly formatted, please ensure that the password contains at least 8 characters, a capital letter, a number and a special character.";
+            response += """
+                    Password is not correctly formatted,\s
+                    please ensure that the password contains at least 8 characters,\s
+                    a capital letter, a number and a special character.""";
         }
         return response;
     }
 
-    public boolean loginUser(User providedUser, User referenceUser) {
+    public boolean loginUser(User providedUser, User referenceUser) { //TODO: Review if this API is necessary
         return providedUser.equals(referenceUser);
     }
 
     public String returnLoginStatus(User providedUser, User referenceUser) {
-        if(loginUser(providedUser, referenceUser)) {
+        if(providedUser.equals(referenceUser)) {
             return "Welcome " + referenceUser.getFirstName() + " " + referenceUser.getLastName() + " it is great to see you again.";
         } else {
             return "Username or password incorrect, please try again";
