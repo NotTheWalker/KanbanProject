@@ -1,13 +1,21 @@
-package src;
+package src.main;
 
 import javax.swing.*;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static javax.swing.JOptionPane.*;
 
 public class Login {
 
+    //@ValueSource(strings = {"wsoo_", "inep_", "mcar_", "hnak_", "eros_"})
+    //@ValueSource(strings = {"caleb", "jacques", "ethan", "kayla", "chad"})
     Logger logger = Logger.getLogger(Login.class.getName());
+    Pattern PATTERN_CAPITAL = Pattern.compile("[A-Z]");
+    Pattern PATTERN_NUMBER = Pattern.compile("[0-9]");
+    Pattern PATTERN_SPECIAL = Pattern.compile("[^a-zA-Z\\d\\s:]");
+
     private final String[] SUCCESS_OPTIONS = {"Continue", "Exit"};
     private final String[] FAILURE_OPTIONS = {"Try Again", "Exit"};
     private User user;
@@ -49,7 +57,7 @@ public class Login {
 
             for(User u: allUsers){
                 logger.info(u.toString());
-                if(u.equals(user)) {
+                if(loginUser(this.user, u)) {
                     referenceUser = u;
                     goodLogin = true;
                     break;
@@ -101,7 +109,7 @@ public class Login {
             providedUser.setPassword(new String(passwordField.getPassword()));
             response = returnRegistrationStatus(providedUser);
 
-            if(providedUser.checkUserName() && providedUser.checkPasswordComplexity()) {
+            if(checkUserName(providedUser.getUserName()) && checkPasswordComplexity(providedUser.getPassword())) {
                 Object[] detailsMessage = {
                         detailsPrompt, "First name:", firstNameField,
                         "Last name:", lastNameField
@@ -137,8 +145,8 @@ public class Login {
 
 
     public String returnRegistrationStatus(User user) {
-        boolean goodUsername = user.checkUserName();
-        boolean goodPassword = user.checkPasswordComplexity();
+        boolean goodUsername = checkUserName();
+        boolean goodPassword = checkPasswordComplexity();
         String response = "";
         if(goodUsername) {
             response += "Username successfully captured";
@@ -170,5 +178,28 @@ public class Login {
         } else {
             return "Username or password incorrect, please try again";
         }
+    }
+
+    public boolean checkUserName(String userName){ //checks if the username is valid
+        boolean lessThan5 = userName.length()<=5;
+        boolean containsUnderscore = userName.contains("_");
+        return lessThan5 && containsUnderscore;
+    }
+    public boolean checkUserName() {
+        return checkUserName(this.user.getUserName());
+    }
+    public boolean checkPasswordComplexity(String password){ //checks if the password is valid
+        Matcher matcherCapital = PATTERN_CAPITAL.matcher(password);
+        Matcher matcherNumber = PATTERN_NUMBER.matcher(password);
+        Matcher matcherSpecial = PATTERN_SPECIAL.matcher(password);
+        boolean moreThan8 = password.length()>=8;
+        boolean containsCapital = matcherCapital.find();
+        boolean containsNumber = matcherNumber.find();
+        boolean containsSpecial = matcherSpecial.find();
+        logger.info("Password complexity: "+moreThan8+" "+containsCapital+" "+containsNumber+" "+containsSpecial);
+        return moreThan8 && containsCapital && containsNumber && containsSpecial;
+    }
+    public boolean checkPasswordComplexity() {
+        return checkPasswordComplexity(this.user.getPassword());
     }
 }

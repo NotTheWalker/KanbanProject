@@ -1,16 +1,11 @@
-package src;
+package src.main;
 
 import java.util.Objects;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class User {
 
     Logger logger = Logger.getLogger(User.class.getName());
-    Pattern PATTERN_CAPITAL = Pattern.compile("[A-Z]");
-    Pattern PATTERN_NUMBER = Pattern.compile("[0-9]");
-    Pattern PATTERN_SPECIAL = Pattern.compile("[^a-zA-Z\\d\\s:]");
 
     private String userName;
     private String password;
@@ -80,28 +75,11 @@ public class User {
 
     @Override
     public String toString() {
-        return "src.User{" +
+        return "src.main.User{" +
                 "userName='" + userName + '\'' +
                 ", password='" + password + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 '}';
-    }
-
-    boolean checkUserName(){ //checks if the username is valid
-        boolean lessThan5 = this.userName.length()<=5;
-        boolean containsUnderscore = this.userName.contains("_");
-        return lessThan5 && containsUnderscore;
-    }
-    boolean checkPasswordComplexity(){ //checks if the password is valid
-        Matcher matcherCapital = PATTERN_CAPITAL.matcher(this.password);
-        Matcher matcherNumber = PATTERN_NUMBER.matcher(this.password);
-        Matcher matcherSpecial = PATTERN_SPECIAL.matcher(this.password);
-        boolean moreThan8 = this.password.length()>=8;
-        boolean containsCapital = matcherCapital.find();
-        boolean containsNumber = matcherNumber.find();
-        boolean containsSpecial = matcherSpecial.find();
-        logger.info("Password complexity: "+moreThan8+" "+containsCapital+" "+containsNumber+" "+containsSpecial);
-        return moreThan8 && containsCapital && containsNumber && containsSpecial;
     }
 }

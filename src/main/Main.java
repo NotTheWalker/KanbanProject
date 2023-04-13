@@ -1,4 +1,4 @@
-package src;
+package src.main;
 
 import javax.swing.*;
 import java.util.logging.Logger;
@@ -10,6 +10,7 @@ public class Main {
         boolean continueFlag=false;
         String[] options = {"Login", "Register", "Exit"};
         User[] allUsers = new User[0];
+        User currentUser;
         while (!endProgram) {
             int selected = JOptionPane.showOptionDialog(
                     null,
@@ -27,6 +28,7 @@ public class Main {
                     } else {
                         continueFlag = true;
                         logger.info("loginCode: " + loginCode);
+                        currentUser = login.getUser();
                     }
                     logger.info(login.getUser().toString());
                 }
