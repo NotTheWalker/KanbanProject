@@ -181,14 +181,17 @@ public class Login {
     }
 
     public boolean checkUserName(String userName){ //checks if the username is valid
+        if(userName==null) {return false;}
         boolean lessThan5 = userName.length()<=5;
         boolean containsUnderscore = userName.contains("_");
+        logger.info("Username: "+lessThan5+" "+containsUnderscore);
         return lessThan5 && containsUnderscore;
     }
     public boolean checkUserName() {
         return checkUserName(this.user.getUserName());
     }
     public boolean checkPasswordComplexity(String password){ //checks if the password is valid
+        if(password==null) {return false;}
         Matcher matcherCapital = PATTERN_CAPITAL.matcher(password);
         Matcher matcherNumber = PATTERN_NUMBER.matcher(password);
         Matcher matcherSpecial = PATTERN_SPECIAL.matcher(password);
