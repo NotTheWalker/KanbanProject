@@ -5,6 +5,9 @@ import static javax.swing.JOptionPane.*;
 
 public class Main {
     static Logger logger = Logger.getLogger(Main.class.getName());
+    static final int LOGIN_OPTION = 0;
+    static final int REGISTER_OPTION = 1;
+
     public static void main(String[] args) {
         boolean endProgram = false;
         boolean continueFlag=false;
@@ -13,13 +16,13 @@ public class Main {
         User currentUser;
 
         //TESTING AREA
-        User[] testUsers = new User[] {
-                new User("foo", "bar", "testFirstName1", "testLastName1"),
-                new User("bar", "foo", "testFirstName2", "testLastName2")
-        };
-        Task testTask = new Task(1, allUserDetails(testUsers));
-        logger.info(testTask.toString());
-        logger.info("End of test");
+//        User[] testUsers = new User[] {
+//                new User("foo", "bar", "testFirstName1", "testLastName1"),
+//                new User("bar", "foo", "testFirstName2", "testLastName2")
+//        };
+//        Task testTask = new Task(1, allUserDetails(testUsers));
+//        logger.info(testTask.toString());
+//        logger.info("End of test");
         //TESTING AREA FINISHED
 
         while (!endProgram) {
@@ -31,7 +34,7 @@ public class Main {
                     INFORMATION_MESSAGE,
                     null, options, options[0]);
             switch (returnOption) {
-                case 0 -> {
+                case LOGIN_OPTION -> {
                     Login login = new Login();
                     int loginCode = login.loginUser(allUsers);
                     if (loginCode == 0) {
@@ -43,7 +46,7 @@ public class Main {
                     }
                     logger.info(login.getUser().toString());
                 }
-                case 1 -> {
+                case REGISTER_OPTION -> {
                     Login register = new Login();
                     int registerCode = register.registerUser();
                     if (registerCode == 0) {
