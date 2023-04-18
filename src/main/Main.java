@@ -1,7 +1,7 @@
 package src.main;
 
-import javax.swing.*;
 import java.util.logging.Logger;
+import static javax.swing.JOptionPane.*;
 
 public class Main {
     static Logger logger = Logger.getLogger(Main.class.getName());
@@ -11,15 +11,26 @@ public class Main {
         String[] options = {"Login", "Register", "Exit"};
         User[] allUsers = new User[0];
         User currentUser;
+
+        //TESTING AREA
+        User[] testUsers = new User[] {
+                new User("foo", "bar", "testFirstName1", "testLastName1"),
+                new User("bar", "foo", "testFirstName2", "testLastName2")
+        };
+        Task testTask = new Task(1, allUserDetails(testUsers));
+        logger.info(testTask.toString());
+        logger.info("End of test");
+        //TESTING AREA FINISHED
+
         while (!endProgram) {
-            int selected = JOptionPane.showOptionDialog(
+            int returnOption = showOptionDialog(
                     null,
                     "Please select an option",
                     "Login/Register",
-                    JOptionPane.DEFAULT_OPTION,
-                    JOptionPane.INFORMATION_MESSAGE,
+                    DEFAULT_OPTION,
+                    INFORMATION_MESSAGE,
                     null, options, options[0]);
-            switch (selected) {
+            switch (returnOption) {
                 case 0 -> {
                     Login login = new Login();
                     int loginCode = login.loginUser(allUsers);
@@ -43,16 +54,26 @@ public class Main {
                     }
                     logger.info(register.getUser().toString());
                 }
-                case 2 -> endProgram = true;
+                case CANCEL_OPTION -> endProgram = true;
             }
             if(continueFlag){
                 continueFlag=false;
                 continue;
             }
+
         }
         //TODO: KANBAN BOARD
         //TODO: ASSOCIATE USERS WITH TASKS
     }
+
+    public static String[] allUserDetails(User[] allUsers){
+        String[] allUserNames = new String[allUsers.length];
+        for(int i=0; i<allUsers.length; i++){
+            allUserNames[i] = allUsers[i].getFirstName()+" "+allUsers[i].getLastName();
+        }
+        return allUserNames;
+    }
+
     public static User[] addUser(User[] allUsers, User newUser) {
         User[] newAllUsers = new User[allUsers.length + 1];
         System.arraycopy(allUsers, 0, newAllUsers, 0, allUsers.length);

@@ -8,9 +8,6 @@ import java.util.regex.Pattern;
 import static javax.swing.JOptionPane.*;
 
 public class Login {
-
-    //@ValueSource(strings = {"wsoo_", "inep_", "mcar_", "hnak_", "eros_"})
-    //@ValueSource(strings = {"caleb", "jacques", "ethan", "kayla", "chad"})
     Logger logger = Logger.getLogger(Login.class.getName());
     Pattern PATTERN_CAPITAL = Pattern.compile("[A-Z]");
     Pattern PATTERN_NUMBER = Pattern.compile("[0-9]");
@@ -49,7 +46,7 @@ public class Login {
                     null, null, null);
             logger.info("Login pane: "+loginCode);
 
-            if(loginCode==2) {return loginCode;}
+            if(loginCode==CANCEL_OPTION) {return loginCode;}
 
             providedUser.setUserName(userField.getText());
             providedUser.setPassword(new String(passwordField.getPassword()));
@@ -67,14 +64,14 @@ public class Login {
 
             if (goodLogin) {
                 showMessageDialog(null, response, "Success", PLAIN_MESSAGE);
-                return 0;
+                return OK_OPTION;
             } else {
                 int failureCode = showOptionDialog(
                         null, response, "Failure",
                         YES_NO_OPTION, PLAIN_MESSAGE,
                         null, FAILURE_OPTIONS, FAILURE_OPTIONS[0]);
                 logger.info("Failure pane: "+failureCode);
-                if (failureCode == 2) {
+                if (failureCode == CANCEL_OPTION || failureCode == NO_OPTION) {
                     return failureCode;
                 }
             }
