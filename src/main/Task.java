@@ -5,6 +5,8 @@ import java.awt.*;
 import java.util.logging.Logger;
 
 public class Task {
+
+    private static int instanceCount;
     Logger logger = Logger.getLogger(Task.class.getName());
     private String name;
     private int taskNumber;
@@ -14,6 +16,10 @@ public class Task {
     private String taskID;
     private Status taskStatus;
 
+    public Task(String taskName, String description, String developerDetails, int estimatedDuration) {
+        new Task(taskName, instanceCount, description, developerDetails, estimatedDuration);
+    }
+
     public Task(String taskName, int taskNumber, String description, String developerDetails, int estimatedDuration) {
         this.name = taskName;
         this.taskNumber = taskNumber;
@@ -22,6 +28,11 @@ public class Task {
         this.estimatedDuration = estimatedDuration;
         this.taskID = createTaskID();
         this.taskStatus = Status.TO_DO;
+        instanceCount++;
+    }
+
+    public Task(String[] allDeveloperDetails) {
+        new Task(instanceCount, allDeveloperDetails);
     }
 
     public Task(int taskNumber, String[] allDeveloperDetails) {
@@ -62,6 +73,7 @@ public class Task {
         this.estimatedDuration = Integer.parseInt(durationField.getText());
         this.taskID = createTaskID();
         this.taskStatus = Status.TO_DO;
+        instanceCount++;
     }
 
     public boolean checkTaskDescription() {

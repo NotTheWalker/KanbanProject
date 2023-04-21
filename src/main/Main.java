@@ -57,7 +57,7 @@ public class Main {
                     }
                     logger.info(register.getUser().toString());
                 }
-                case CANCEL_OPTION -> endProgram = true;
+                case CANCEL_OPTION, CLOSED_OPTION -> endProgram = true;
             }
             if(continueFlag){
                 continueFlag=false;
