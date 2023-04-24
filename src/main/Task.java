@@ -2,12 +2,17 @@ package src.main;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.OptionalInt;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class Task {
-
-    private static int instanceCount;
     Logger logger = Logger.getLogger(Task.class.getName());
+    public static final HashMap<String, Integer> mapDetailsInstance = new HashMap<>();
+    public static final HashMap<String, Integer> mapDetailsHours = new HashMap<>();
     private String name;
     private int taskNumber;
     private String description;
@@ -16,26 +21,23 @@ public class Task {
     private String taskID;
     private Status taskStatus;
 
-    public Task(String taskName, String description, String developerDetails, int estimatedDuration) {
-        new Task(taskName, instanceCount, description, developerDetails, estimatedDuration);
+    public Task() {
     }
 
-    public Task(String taskName, int taskNumber, String description, String developerDetails, int estimatedDuration) {
+    public Task(String taskName, String description, String developerDetails, int estimatedDuration) {
         this.name = taskName;
-        this.taskNumber = taskNumber;
         this.description = description;
         this.developerDetails = developerDetails;
         this.estimatedDuration = estimatedDuration;
-        this.taskID = createTaskID();
         this.taskStatus = Status.TO_DO;
-        instanceCount++;
+        int latest = latestInstance();
+        mapDetailsInstance.put(this.developerDetails, latest);
+        this.taskNumber = latest;
+        this.taskID = createTaskID();
+        mapDetailsHours.put(this.developerDetails, this.estimatedDuration);
     }
 
     public Task(String[] allDeveloperDetails) {
-        new Task(instanceCount, allDeveloperDetails);
-    }
-
-    public Task(int taskNumber, String[] allDeveloperDetails) {
 
         final JFrame frame = new JFrame("New Task");
 
@@ -64,20 +66,26 @@ public class Task {
         FlowLayout taskLayout = new FlowLayout();
         frame.setLayout(taskLayout);
 
-        int returnCode = JOptionPane.showOptionDialog(frame, taskComponents, "Task "+taskNumber, JOptionPane.OK_CANCEL_OPTION ,JOptionPane.PLAIN_MESSAGE, null, null, null);
+        int latest = latestInstance();
+        int returnCode = JOptionPane.showOptionDialog(frame, taskComponents, "Task "+latest, JOptionPane.OK_CANCEL_OPTION ,JOptionPane.PLAIN_MESSAGE, null, null, null);
         logger.info("Task pane: "+returnCode);
         this.name = nameField.getText();
-        this.taskNumber = taskNumber;
         this.description = descriptionField.getText();
-        this.developerDetails = allDeveloperDetails[0]; //testing
+        this.developerDetails = allDeveloperDetails[0]; //FIXME: Testing value
         this.estimatedDuration = Integer.parseInt(durationField.getText());
-        this.taskID = createTaskID();
         this.taskStatus = Status.TO_DO;
-        instanceCount++;
+        mapDetailsInstance.put(this.developerDetails, latest);
+        this.taskNumber = latest;
+        this.taskID = createTaskID();
+        mapDetailsHours.put(this.developerDetails, this.estimatedDuration);
     }
 
     public boolean checkTaskDescription() {
-        return this.description.length()<=50;
+        return checkTaskDescription(this.description);
+    }
+
+    public boolean checkTaskDescription(String description) {
+        return description.length()<=50;
     }
 
     public String createTaskID() {
@@ -136,6 +144,10 @@ public class Task {
         this.taskID = taskID;
     }
 
+    public void setTaskID() {
+        this.taskID = createTaskID();
+    }
+
     public Status getTaskStatus() {
         return taskStatus;
     }
@@ -154,6 +166,30 @@ public class Task {
             case 1 -> this.taskStatus = Status.DOING;
             case 2 -> this.taskStatus = Status.DONE;
         }
+    }
+
+    public int latestInstance() {
+        if(mapDetailsInstance.size()==0) {
+            return 0;
+        } else {
+            OptionalInt latest = mapDetailsInstance.values().stream().mapToInt(Integer::intValue).max();
+            return latest.getAsInt();
+        }
+    }
+
+    public static int getTotalHours() {
+        return mapDetailsHours.values().stream().mapToInt(Integer::intValue).sum();
+    }
+
+    public static int getFilteredHours(String filterName) {
+        Map<String, Integer> filteredMap = mapDetailsHours.entrySet()
+                .stream().filter(x-> Objects.equals(x.getKey(), filterName))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        return filteredMap.values().stream().mapToInt(Integer::intValue).sum();
+    }
+
+    public void addDetailsHours() {
+        mapDetailsHours.put(this.developerDetails, this.estimatedDuration);
     }
 
     @Override
