@@ -145,8 +145,8 @@ public class Login {
 
 
     public String returnRegistrationStatus(User user) {
-        boolean goodUsername = checkUserName();
-        boolean goodPassword = checkPasswordComplexity();
+        boolean goodUsername = checkUserName(user.getUserName());
+        boolean goodPassword = checkPasswordComplexity(user.getPassword());
         String response = "";
         if(goodUsername) {
             response += "Username successfully captured";
