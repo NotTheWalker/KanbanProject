@@ -26,11 +26,11 @@ public class Main {
         boolean endProgram = false;
         User currentUser;
 
-        if(USERS_FILE.exists()) {
+        if(USERS_FILE.exists()) { //if the file exists, read from it
             allUsers = readUsersFromXML();
         }
 
-        while (!endProgram) {
+        while (!endProgram) { //initialise control loop
             int returnOption = showOptionDialog(
                     null,
                     "Please select an option",
@@ -38,8 +38,9 @@ public class Main {
                     DEFAULT_OPTION,
                     INFORMATION_MESSAGE,
                     null, OPTIONS, OPTIONS[0]);
+            //login/register/exit pane
             switch (returnOption) {
-                case 0 -> {
+                case 0 -> { //login
                     Login login = new Login();
                     int loginCode = login.loginUser(allUsers);
                     if (loginCode == 0) {
@@ -49,7 +50,7 @@ public class Main {
                         logger.info("loginCode: " + loginCode);
                     }
                 }
-                case 1 -> {
+                case 1 -> { //register
                     Login register = new Login();
                     int registerCode = register.registerUser();
                     if (registerCode == 2) {
@@ -58,10 +59,10 @@ public class Main {
                         allUsers = addUser(allUsers, register.getUser());
                     }
                 }
-                case 2 -> endProgram = true;
+                case 2 -> endProgram = true; //exit
             }
         }
-        writeUsersToXML();
+        writeUsersToXML(); //write all users to XML upon exit
         //TODO: KANBAN BOARD
         //TODO: ASSOCIATE USERS WITH TASKS
     }
