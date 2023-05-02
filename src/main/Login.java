@@ -103,7 +103,7 @@ public class Login {
                     null, null, null);
             logger.info("Register pane: "+registerCode);
 
-            if(registerCode==2) {break;}
+            if(registerCode==2) {return registerCode;}
 
             providedUser.setUserName(userField.getText());
             providedUser.setPassword(new String(passwordField.getPassword()));
@@ -116,14 +116,15 @@ public class Login {
                 };
                 registerCode = showOptionDialog(
                         null, detailsMessage, "Register",
-                        YES_NO_OPTION, PLAIN_MESSAGE,
+                        OK_CANCEL_OPTION, PLAIN_MESSAGE,
                         null, null, null);
                 logger.info("Details pane: "+registerCode);
                 if(registerCode==0) {
-
                     providedUser.setFirstName(firstNameField.getText());
                     providedUser.setLastName(lastNameField.getText());
                     this.user = providedUser;
+                } else {
+                    return registerCode;
                 }
                 registerCode = showOptionDialog(
                         null, response, "Registration Successful",

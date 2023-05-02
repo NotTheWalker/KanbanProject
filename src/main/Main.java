@@ -24,7 +24,6 @@ public class Main {
     public static final String[] OPTIONS = {"Login", "Register", "Exit"};
     public static void main(String[] args) {
         boolean endProgram = false;
-        boolean continueFlag=false;
         User currentUser;
 
         if(USERS_FILE.exists()) {
@@ -45,30 +44,21 @@ public class Main {
                     int loginCode = login.loginUser(allUsers);
                     if (loginCode == 0) {
                         logger.info("Login successful");
-                    } else {
-                        continueFlag = true;
-                        logger.info("loginCode: " + loginCode);
                         currentUser = login.getUser();
+                    } else {
+                        logger.info("loginCode: " + loginCode);
                     }
-                    logger.info(login.getUser().toString());
                 }
                 case 1 -> {
                     Login register = new Login();
                     int registerCode = register.registerUser();
-                    if (registerCode == 0) {
-                        allUsers = addUser(allUsers, register.getUser());
-                    } else {
-                        continueFlag = true;
+                    if (registerCode == 2) {
                         logger.info("registerCode: " + registerCode);
+                    } else {
+                        allUsers = addUser(allUsers, register.getUser());
                     }
-
-                    logger.info(register.getUser().toString());
                 }
                 case 2 -> endProgram = true;
-            }
-            if(continueFlag){
-                continueFlag=false;
-                continue;
             }
         }
         writeUsersToXML();
