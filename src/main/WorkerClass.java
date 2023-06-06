@@ -19,52 +19,67 @@ import static javax.swing.JOptionPane.*;
 
 public class WorkerClass {
     static Logger logger = Logger.getLogger(WorkerClass.class.getName());
-    public static UserClass[] allUserClasses = new UserClass[0];
     public static File USERS_FILE = new File("src/main/resources/users.xml");
+
+    private static UserClass[] allUsers = new UserClass[0];
+    private static UserClass currentUserClass;
     public static final String[] OPTIONS = {"Login", "Register", "Exit"};
+    private static boolean endProgram = false;
+
     public static void start() {
-        boolean endProgram = false;
-        UserClass currentUserClass;
 
         if(USERS_FILE.exists()) { //if the file exists, read from it
-            allUserClasses = readUsersFromXML();
+            allUsers = readUsersFromXML();
         }
 
         while (!endProgram) { //initialise control loop
-            int returnOption = showOptionDialog(
-                    null,
-                    "Please select an option",
-                    "Login/Register",
-                    DEFAULT_OPTION,
-                    INFORMATION_MESSAGE,
-                    null, OPTIONS, OPTIONS[0]);
-            //login/register/exit pane
-            switch (returnOption) {
-                case 0 -> { //login
-                    LoginClass login = new LoginClass();
-                    int loginCode = login.loginUser(allUserClasses);
-                    if (loginCode == 0) {
-                        logger.info("Login successful");
-                        currentUserClass = login.getUser();
-                    } else {
-                        logger.info("loginCode: " + loginCode);
-                    }
-                }
-                case 1 -> { //register
-                    LoginClass register = new LoginClass();
-                    int registerCode = register.registerUser();
-                    if (registerCode == 2) {
-                        logger.info("registerCode: " + registerCode);
-                    } else {
-                        allUserClasses = addUser(allUserClasses, register.getUser());
-                    }
-                }
-                case 2 -> endProgram = true; //exit
-            }
+            entry();
+            if(endProgram) break;
         }
         writeUsersToXML(); //write all users to XML upon exit
         //TODO: KANBAN BOARD
         //TODO: ASSOCIATE USERS WITH TASKS
+    }
+
+    private static void entry() {
+        while(true) {
+            int returnOption = menuPrompt(); //0 = login, 1 = register, 2 = exit
+            switch (returnOption) {
+                case 0 -> { //login
+                    LoginClass.login(allUsers);
+                    if (!LoginClass.isCancelled()&&LoginClass.isGoodLogin()) {
+                        currentUserClass = LoginClass.getUser();
+                        logger.info("User logged in");
+                        return;
+                    } else if(LoginClass.isCancelled()) {
+                        logger.info("Login cancelled");
+                        return;
+                    }
+                }
+                case 1 -> { //register
+                    LoginClass.registerUser();
+                    if (!LoginClass.isCancelled()) {
+                        allUsers = addUser(allUsers, LoginClass.getUser());
+                        logger.info("User registered");
+                    }
+                }
+                case 2 -> { //exit
+                    endProgram = true;
+                    logger.info("Program exited");
+                    return;
+                }
+            }
+        }
+    }
+
+    private static int menuPrompt() {
+        return showOptionDialog(
+                null,
+                "Please select an option",
+                "Login/Register",
+                DEFAULT_OPTION,
+                INFORMATION_MESSAGE,
+                null, OPTIONS, OPTIONS[0]);
     }
 
     public static String[] allUserDetails(UserClass[] allUserClasses){
@@ -82,6 +97,7 @@ public class WorkerClass {
         return newAllUserClasses;
     }
 
+    //Region XML methods
     public static void writeUsersToXML() {
         if (USERS_FILE.exists()) {
             convertToBackup();
@@ -94,7 +110,7 @@ public class WorkerClass {
             Element rootElement = doc.createElement("users");
             doc.appendChild(rootElement);
 
-            for (UserClass u : allUserClasses) {
+            for (UserClass u : allUsers) {
                 Element user = doc.createElement("user");
                 rootElement.appendChild(user);
                 user.setAttribute("firstName", u.getFirstName());

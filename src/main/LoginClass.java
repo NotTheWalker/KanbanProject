@@ -7,143 +7,170 @@ import static javax.swing.JOptionPane.*;
 
 public class LoginClass {
 
-    //@ValueSource(strings = {"wsoo_", "inep_", "mcar_", "hnak_", "eros_"})
-    //@ValueSource(strings = {"caleb", "jacques", "ethan", "kayla", "chad"})
-    Logger logger = Logger.getLogger(LoginClass.class.getName());
-    Pattern PATTERN_CAPITAL = Pattern.compile("[A-Z]");
-    Pattern PATTERN_NUMBER = Pattern.compile("[0-9]");
-    Pattern PATTERN_SPECIAL = Pattern.compile("[^a-zA-Z\\d\\s:]");
+    static Logger logger = Logger.getLogger(LoginClass.class.getName());
 
-    private final String[] SUCCESS_OPTIONS = {"Continue", "Exit"};
-    private final String[] FAILURE_OPTIONS = {"Try Again", "Exit"};
-    private UserClass userClass;
-    private String response;
+    private static final String[] SUCCESS_OPTIONS = {"Continue", "Exit"};
+    private static final String[] FAILURE_OPTIONS = {"Try Again", "Exit"};
 
-    public UserClass getUser() {
-        return userClass;
+    private static JTextField userField = new JTextField();
+    private static JPasswordField passwordField = new JPasswordField();
+    private static JTextField firstNameField = new JTextField();
+    private static JTextField lastNameField = new JTextField();
+    private static UserClass providedUser;
+
+    public static boolean isGoodLogin() {
+        return goodLogin;
     }
 
-    public LoginClass() {
+    public static boolean isGoodRegister() {
+        return goodRegister;
     }
 
-    public int loginUser(UserClass[] allUserClasses) {
-        boolean goodLogin = false;
+    private static boolean goodLogin = false;
+    private static boolean goodRegister = false;
+    private static boolean cancelOperation = false;
+    private static String response;
 
-        UserClass providedUserClass = new UserClass("foo", "bar");
-        UserClass referenceUserClass = new UserClass("foo", "bar");
+    public static UserClass getUser() {
+        return providedUser;
+    }
 
-        JTextField userField = new JTextField();
-        JPasswordField passwordField = new JPasswordField();
+    public static boolean isCancelled() {
+        return cancelOperation;
+    }
 
-        String registerPrompt = "Please enter your username and password";
+    public static void login(UserClass[] allUserClasses) {
+        logger.info("Login initiated");
+        goodLogin = false;
+        cancelOperation = false;
+
         while (true) {
-            Object[] registerMessage = {
-                    registerPrompt, "Username:", userField,
-                    "Password:", passwordField
-            };
-            int loginCode = showOptionDialog(
-                    null, registerMessage, "Login",
-                    OK_CANCEL_OPTION, PLAIN_MESSAGE,
-                    null, null, null);
-            logger.info("Login pane: "+loginCode);
+            int loginCode = loginPrompt();
 
-            if(loginCode==2) {return loginCode;}
+            if(loginCode==2) { //cancel
+                cancelOperation = true;
+                logger.info("Login cancellation signalled");
+                return;
+            }
 
-            providedUserClass.setUserName(userField.getText());
-            providedUserClass.setPassword(new String(passwordField.getPassword()));
-            this.userClass = providedUserClass;
+            providedUser = new UserClass(userField.getText(), new String(passwordField.getPassword()));
 
-            for(UserClass u: allUserClasses){
-                logger.info(u.toString());
-                if(loginUser(this.userClass, u)) {
-                    referenceUserClass = u;
+            for(UserClass referenceUser: allUserClasses){
+                if(loginUser(providedUser, referenceUser)) {
+                    providedUser.setFirstName(referenceUser.getFirstName());
+                    providedUser.setLastName(referenceUser.getLastName());
                     goodLogin = true;
+                    logger.info("Login success signalled");
                     break;
                 }
             }
-            response = returnLoginStatus(userClass, referenceUserClass);
+            response = returnLoginStatus();
 
-            if (goodLogin) {
-                showMessageDialog(null, response, "Success", PLAIN_MESSAGE);
-                return 0;
-            } else {
-                int failureCode = showOptionDialog(
-                        null, response, "Failure",
-                        YES_NO_OPTION, PLAIN_MESSAGE,
-                        null, FAILURE_OPTIONS, FAILURE_OPTIONS[0]);
-                logger.info("Failure pane: "+failureCode);
-                if (failureCode == 2) {
-                    return failureCode;
-                }
+            if (goodLogin || loginFailure() == 2) { //if login is successful or user chooses to exit
+                logger.info("Return to menu signalled");
+                return; //return to menu
             }
+
         }
     }
 
-    public int registerUser() {
-        UserClass providedUserClass = new UserClass("foo", "bar");
-        int registerCode;
+    private static int loginPrompt() {
+        userField.setText("");
+        passwordField.setText("");
+        Object[] loginMessage = {
+                "Please enter your username and password",
+                "Username:", userField,
+                "Password:", passwordField
+        };
+        int responseCode = showOptionDialog( //0: ok, 2: cancel
+                null, loginMessage, "Login",
+                OK_CANCEL_OPTION, PLAIN_MESSAGE,
+                null, null, null);
+        return responseCode;
+    }
 
-        JTextField userField = new JTextField();
-        JPasswordField passwordField = new JPasswordField();
-        JTextField firstNameField = new JTextField();
-        JTextField lastNameField = new JTextField();
+    private static int loginFailure() {
+        int responseCode = showOptionDialog(
+                null, response, "Failure",
+                YES_NO_OPTION, PLAIN_MESSAGE,
+                null, FAILURE_OPTIONS, FAILURE_OPTIONS[0]);
+        return responseCode;
+    }
 
-        String registerPrompt = "Please enter your username and password";
-        String detailsPrompt = "Please enter your first and last name";
+    public static void registerUser() {
+        logger.info("Registration initiated");
+        goodRegister = false;
+        cancelOperation = false;
+
         while (true) {
-            Object[] registerMessage = {
-                    registerPrompt, "Username:", userField,
-                    "Password:", passwordField
-            };
-            registerCode = showOptionDialog(
-                    null, registerMessage, "Register",
-                    OK_CANCEL_OPTION, PLAIN_MESSAGE,
-                    null, null, null);
-            logger.info("Register pane: "+registerCode);
+            int registerCode = registerPrompt();
 
-            if(registerCode==2) {return registerCode;}
+            if(registerCode==2) { //cancel
+                cancelOperation = true;
+                logger.info("Registration cancellation signalled");
+                return;
+            }
 
-            providedUserClass.setUserName(userField.getText());
-            providedUserClass.setPassword(new String(passwordField.getPassword()));
-            response = returnRegistrationStatus(providedUserClass);
+            providedUser = new UserClass(userField.getText(), new String(passwordField.getPassword()));
+            response = returnRegistrationStatus(providedUser);
 
-            if(checkUserName(providedUserClass.getUserName()) && checkPasswordComplexity(providedUserClass.getPassword())) {
-                Object[] detailsMessage = {
-                        detailsPrompt, "First name:", firstNameField,
-                        "Last name:", lastNameField
-                };
-                registerCode = showOptionDialog(
-                        null, detailsMessage, "Register",
-                        OK_CANCEL_OPTION, PLAIN_MESSAGE,
-                        null, null, null);
-                logger.info("Details pane: "+registerCode);
-                if(registerCode==0) {
-                    providedUserClass.setFirstName(firstNameField.getText());
-                    providedUserClass.setLastName(lastNameField.getText());
-                    this.userClass = providedUserClass;
+            if(checkUserName() && checkPasswordComplexity()) {
+                goodRegister = true;
+
+                if (registerDetailsPrompt() != 0) {
+                    cancelOperation = true;
+                    goodRegister = false;
+                    logger.info("Registration cancellation signalled at line " + Thread.currentThread().getStackTrace()[1].getLineNumber());
                 } else {
-                    return registerCode;
+                    providedUser.setFirstName(firstNameField.getText());
+                    providedUser.setLastName(lastNameField.getText());
+                    logger.info("Registration details successfully captured");
                 }
-                registerCode = showOptionDialog(
-                        null, response, "Registration Successful",
-                        DEFAULT_OPTION, QUESTION_MESSAGE,
-                        null, SUCCESS_OPTIONS, SUCCESS_OPTIONS[0]);
-                logger.info("Success pane: "+registerCode);
-                break;
-            } else {
-                registerCode = showOptionDialog(
-                        null, response, "Registration Failed",
-                        DEFAULT_OPTION, QUESTION_MESSAGE,
-                        null, FAILURE_OPTIONS, FAILURE_OPTIONS[0]);
-                logger.info("Failure pane: "+registerCode);
-                if(registerCode==2) {break;}
+                return;
+            } else if(registerFailed()==1) {
+                cancelOperation = true;
+                logger.info("Registration cancellation signalled at line " + Thread.currentThread().getStackTrace()[1].getLineNumber());
+                return;
             }
         }
-        return registerCode;
+    }
+
+    private static int registerPrompt() {
+        String registerPrompt = "Please enter your username and password";
+        Object[] registerMessage = {
+                registerPrompt, "Username:", userField,
+                "Password:", passwordField
+        };
+        int responseCode = showOptionDialog(
+                null, registerMessage, "Register",
+                OK_CANCEL_OPTION, PLAIN_MESSAGE,
+                null, null, null);
+        return responseCode;
+    }
+
+    private static int registerDetailsPrompt() {
+        String detailsPrompt = "Please enter your first and last name";
+        Object[] detailsMessage = {
+                detailsPrompt, "First name:", firstNameField,
+                "Last name:", lastNameField
+        };
+        int responseCode = showOptionDialog(
+                null, detailsMessage, "Register",
+                DEFAULT_OPTION, PLAIN_MESSAGE,
+                null, null, null);
+        return responseCode;
+    }
+
+    private static int registerFailed() {
+        int responseCode = showOptionDialog(
+                null, response, "Registration Failed",
+                DEFAULT_OPTION, QUESTION_MESSAGE,
+                null, FAILURE_OPTIONS, FAILURE_OPTIONS[0]);
+        return responseCode;
     }
 
 
-    public String returnRegistrationStatus(UserClass userClass) {
+    public static String returnRegistrationStatus(UserClass userClass) {
         boolean goodUsername = checkUserName(userClass.getUserName());
         boolean goodPassword = checkPasswordComplexity(userClass.getPassword());
         String response = "";
@@ -167,30 +194,34 @@ public class LoginClass {
         return response;
     }
 
-    public boolean loginUser(UserClass providedUserClass, UserClass referenceUserClass) { //TODO: Review if this API is necessary
+    public static boolean loginUser(UserClass providedUserClass, UserClass referenceUserClass) { //TODO: Review if this API is necessary
         return providedUserClass.equals(referenceUserClass);
     }
 
-    public String returnLoginStatus(UserClass providedUserClass, UserClass referenceUserClass) {
-        if(providedUserClass.equals(referenceUserClass)) {
-            return "Welcome " + referenceUserClass.getFirstName() + " " + referenceUserClass.getLastName() + " it is great to see you again.";
+    public static String returnLoginStatus() {
+        if(goodLogin) {
+            return "Welcome " + providedUser.getFirstName() + " " + providedUser.getLastName() + " it is great to see you again.";
         } else {
             return "Username or password incorrect, please try again";
         }
     }
 
-    public boolean checkUserName(String userName){ //checks if the username is valid
+    public static boolean checkUserName(String userName){ //checks if the username is valid
         if(userName==null) {return false;}
         boolean lessThan5 = userName.length()<=5;
         boolean containsUnderscore = userName.contains("_");
-        logger.info("Username: "+lessThan5+" "+containsUnderscore);
         return lessThan5 && containsUnderscore;
     }
-    public boolean checkUserName() {
-        return checkUserName(this.userClass.getUserName());
+
+    public static boolean checkUserName() {
+        return checkUserName(providedUser.getUserName());
     }
-    public boolean checkPasswordComplexity(String password){ //checks if the password is valid
+
+    public static boolean checkPasswordComplexity(String password){ //checks if the password is valid
         if(password==null) {return false;}
+        Pattern PATTERN_CAPITAL = Pattern.compile("[A-Z]"); //capital letter regex
+        Pattern PATTERN_NUMBER = Pattern.compile("[0-9]"); //number regex
+        Pattern PATTERN_SPECIAL = Pattern.compile("[^a-zA-Z\\d\\s:]"); //special character regex
         Matcher matcherCapital = PATTERN_CAPITAL.matcher(password);
         Matcher matcherNumber = PATTERN_NUMBER.matcher(password);
         Matcher matcherSpecial = PATTERN_SPECIAL.matcher(password);
@@ -198,10 +229,10 @@ public class LoginClass {
         boolean containsCapital = matcherCapital.find();
         boolean containsNumber = matcherNumber.find();
         boolean containsSpecial = matcherSpecial.find();
-        logger.info("Password complexity: "+moreThan8+" "+containsCapital+" "+containsNumber+" "+containsSpecial);
         return moreThan8 && containsCapital && containsNumber && containsSpecial;
     }
-    public boolean checkPasswordComplexity() {
-        return checkPasswordComplexity(this.userClass.getPassword());
+
+    public static boolean checkPasswordComplexity() {
+        return checkPasswordComplexity(providedUser.getPassword());
     }
 }
