@@ -1,28 +1,28 @@
 import java.util.Objects;
 import java.util.logging.Logger;
 
-public class User {
+public class UserClass {
 
-    Logger logger = Logger.getLogger(User.class.getName());
+    Logger logger = Logger.getLogger(UserClass.class.getName());
 
     private String userName;
     private String password;
     private String firstName = null;
     private String lastName = null;
 
-    public User(String userName, String password, String firstName, String lastName) { //TODO: is this constructor necessary?
+    public UserClass(String userName, String password, String firstName, String lastName) { //TODO: is this constructor necessary?
         this.userName = userName;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
     }
 
-    public User(String userName, String password) {
+    public UserClass(String userName, String password) {
         this.userName = userName;
         this.password = password;
     }
 
-    public User() {
+    public UserClass() {
         //TODO: see above
     }
 
@@ -62,8 +62,8 @@ public class User {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return Objects.equals(userName, user.userName) && Objects.equals(password, user.password);
+        UserClass userClass = (UserClass) o;
+        return Objects.equals(userName, userClass.userName) && Objects.equals(password, userClass.password);
     }
 
     @Override

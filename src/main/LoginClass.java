@@ -5,32 +5,32 @@ import java.util.regex.Pattern;
 
 import static javax.swing.JOptionPane.*;
 
-public class Login {
+public class LoginClass {
 
     //@ValueSource(strings = {"wsoo_", "inep_", "mcar_", "hnak_", "eros_"})
     //@ValueSource(strings = {"caleb", "jacques", "ethan", "kayla", "chad"})
-    Logger logger = Logger.getLogger(Login.class.getName());
+    Logger logger = Logger.getLogger(LoginClass.class.getName());
     Pattern PATTERN_CAPITAL = Pattern.compile("[A-Z]");
     Pattern PATTERN_NUMBER = Pattern.compile("[0-9]");
     Pattern PATTERN_SPECIAL = Pattern.compile("[^a-zA-Z\\d\\s:]");
 
     private final String[] SUCCESS_OPTIONS = {"Continue", "Exit"};
     private final String[] FAILURE_OPTIONS = {"Try Again", "Exit"};
-    private User user;
+    private UserClass userClass;
     private String response;
 
-    public User getUser() {
-        return user;
+    public UserClass getUser() {
+        return userClass;
     }
 
-    public Login() {
+    public LoginClass() {
     }
 
-    public int loginUser(User[] allUsers) {
+    public int loginUser(UserClass[] allUserClasses) {
         boolean goodLogin = false;
 
-        User providedUser = new User("foo", "bar");
-        User referenceUser = new User("foo", "bar");
+        UserClass providedUserClass = new UserClass("foo", "bar");
+        UserClass referenceUserClass = new UserClass("foo", "bar");
 
         JTextField userField = new JTextField();
         JPasswordField passwordField = new JPasswordField();
@@ -49,19 +49,19 @@ public class Login {
 
             if(loginCode==2) {return loginCode;}
 
-            providedUser.setUserName(userField.getText());
-            providedUser.setPassword(new String(passwordField.getPassword()));
-            this.user = providedUser;
+            providedUserClass.setUserName(userField.getText());
+            providedUserClass.setPassword(new String(passwordField.getPassword()));
+            this.userClass = providedUserClass;
 
-            for(User u: allUsers){
+            for(UserClass u: allUserClasses){
                 logger.info(u.toString());
-                if(loginUser(this.user, u)) {
-                    referenceUser = u;
+                if(loginUser(this.userClass, u)) {
+                    referenceUserClass = u;
                     goodLogin = true;
                     break;
                 }
             }
-            response = returnLoginStatus(user, referenceUser);
+            response = returnLoginStatus(userClass, referenceUserClass);
 
             if (goodLogin) {
                 showMessageDialog(null, response, "Success", PLAIN_MESSAGE);
@@ -80,7 +80,7 @@ public class Login {
     }
 
     public int registerUser() {
-        User providedUser = new User("foo", "bar");
+        UserClass providedUserClass = new UserClass("foo", "bar");
         int registerCode;
 
         JTextField userField = new JTextField();
@@ -103,11 +103,11 @@ public class Login {
 
             if(registerCode==2) {return registerCode;}
 
-            providedUser.setUserName(userField.getText());
-            providedUser.setPassword(new String(passwordField.getPassword()));
-            response = returnRegistrationStatus(providedUser);
+            providedUserClass.setUserName(userField.getText());
+            providedUserClass.setPassword(new String(passwordField.getPassword()));
+            response = returnRegistrationStatus(providedUserClass);
 
-            if(checkUserName(providedUser.getUserName()) && checkPasswordComplexity(providedUser.getPassword())) {
+            if(checkUserName(providedUserClass.getUserName()) && checkPasswordComplexity(providedUserClass.getPassword())) {
                 Object[] detailsMessage = {
                         detailsPrompt, "First name:", firstNameField,
                         "Last name:", lastNameField
@@ -118,9 +118,9 @@ public class Login {
                         null, null, null);
                 logger.info("Details pane: "+registerCode);
                 if(registerCode==0) {
-                    providedUser.setFirstName(firstNameField.getText());
-                    providedUser.setLastName(lastNameField.getText());
-                    this.user = providedUser;
+                    providedUserClass.setFirstName(firstNameField.getText());
+                    providedUserClass.setLastName(lastNameField.getText());
+                    this.userClass = providedUserClass;
                 } else {
                     return registerCode;
                 }
@@ -143,9 +143,9 @@ public class Login {
     }
 
 
-    public String returnRegistrationStatus(User user) {
-        boolean goodUsername = checkUserName(user.getUserName());
-        boolean goodPassword = checkPasswordComplexity(user.getPassword());
+    public String returnRegistrationStatus(UserClass userClass) {
+        boolean goodUsername = checkUserName(userClass.getUserName());
+        boolean goodPassword = checkPasswordComplexity(userClass.getPassword());
         String response = "";
         if(goodUsername) {
             response += "Username successfully captured";
@@ -167,13 +167,13 @@ public class Login {
         return response;
     }
 
-    public boolean loginUser(User providedUser, User referenceUser) { //TODO: Review if this API is necessary
-        return providedUser.equals(referenceUser);
+    public boolean loginUser(UserClass providedUserClass, UserClass referenceUserClass) { //TODO: Review if this API is necessary
+        return providedUserClass.equals(referenceUserClass);
     }
 
-    public String returnLoginStatus(User providedUser, User referenceUser) {
-        if(providedUser.equals(referenceUser)) {
-            return "Welcome " + referenceUser.getFirstName() + " " + referenceUser.getLastName() + " it is great to see you again.";
+    public String returnLoginStatus(UserClass providedUserClass, UserClass referenceUserClass) {
+        if(providedUserClass.equals(referenceUserClass)) {
+            return "Welcome " + referenceUserClass.getFirstName() + " " + referenceUserClass.getLastName() + " it is great to see you again.";
         } else {
             return "Username or password incorrect, please try again";
         }
@@ -187,7 +187,7 @@ public class Login {
         return lessThan5 && containsUnderscore;
     }
     public boolean checkUserName() {
-        return checkUserName(this.user.getUserName());
+        return checkUserName(this.userClass.getUserName());
     }
     public boolean checkPasswordComplexity(String password){ //checks if the password is valid
         if(password==null) {return false;}
@@ -202,6 +202,6 @@ public class Login {
         return moreThan8 && containsCapital && containsNumber && containsSpecial;
     }
     public boolean checkPasswordComplexity() {
-        return checkPasswordComplexity(this.user.getPassword());
+        return checkPasswordComplexity(this.userClass.getPassword());
     }
 }
