@@ -17,15 +17,7 @@ public class LoginClass {
     private static JTextField firstNameField = new JTextField();
     private static JTextField lastNameField = new JTextField();
     private static UserClass providedUser;
-
-    public static boolean isGoodLogin() {
-        return goodLogin;
-    }
-
-    public static boolean isGoodRegister() {
-        return goodRegister;
-    }
-
+    
     private static boolean goodLogin = false;
     private static boolean goodRegister = false;
     private static boolean cancelOperation = false;
@@ -33,6 +25,14 @@ public class LoginClass {
 
     public static UserClass getUser() {
         return providedUser;
+    }
+    
+    public static boolean isGoodLogin() {
+        return goodLogin;
+    }
+
+    public static boolean isGoodRegister() {
+        return goodRegister;
     }
 
     public static boolean isCancelled() {
