@@ -1,0 +1,30 @@
+<project name="KanbanProject" default="test" basedir=".">
+
+    <!-- Define properties -->
+    <property name="src.dir" location="src"/>
+    <property name="test.dir" location="test"/>
+    <property name="build.dir" location="build"/>
+
+    <!-- Compile source files -->
+    <target name="compile">
+        <mkdir dir="${build.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="true"/>
+    </target>
+
+    <!-- Run unit tests -->
+    <target name="test" depends="compile">
+        <junit printsummary="yes">
+            <classpath>
+                <pathelement location="${build.dir}" />
+                <!-- dependencies -->
+                <pathelement location="lib/junit-jupiter-api-5.9.3.jar" />
+                <pathelement location="lib/junit-jupiter-params-5.9.3.jar" />
+            </classpath>
+            <batchtest fork="yes" todir="${build.dir}">
+                <fileset dir="${test.dir}">
+                    <include name="**/*Test.java" />
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+</project>
