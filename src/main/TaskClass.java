@@ -4,7 +4,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class TaskClass {
-    public static final HashMap<String, Integer> mapDetailsHours = new HashMap<>();
+    private static final HashMap<String, Integer> mapDetailsHours = new HashMap<>();
+    public static final Map<String, String> mapDetailsNames = new HashMap<>();
     private String taskName;
     private static int taskCount = 0;
     private int taskNumber;
@@ -21,8 +22,8 @@ public class TaskClass {
         this.taskDescription = taskDescription;
         this.developerDetails = developerDetails;
         this.taskDuration = taskDuration;
-        mapDetailsHours.put(developerDetails.toUpperCase(), taskDuration);
         this.taskID = createTaskID();
+        this.addHours();
         this.taskStatus = StatusEnum.TO_DO;
     }
 
@@ -66,30 +67,38 @@ public class TaskClass {
         this.taskStatus = taskStatus;
     }
 
+    public boolean checkTaskName() {
+        return this.taskName.length()>=2; //task name must be at least 2 characters long
+    }
+
+    public boolean checkDeveloperDetails() {
+        return this.developerDetails.length()>=3; //developer name must be at least 3 characters long
+    }
+
     public boolean checkTaskDescription() {
-        return this.taskDescription.length()<=50;
+        return this.taskDescription.length()<=50; //task description must be less than 50 characters long
     }
 
     private String createTaskID() {
+        String details = this.developerDetails; //for readability
         StringBuilder sb = new StringBuilder();
-        sb.append(this.taskName, 0, 2);
+        sb.append(this.taskName, 0, 2); //first two letters of task name
         sb.append(":");
-        sb.append(this.taskNumber);
+        sb.append(this.taskNumber); //task number
         sb.append(":");
-        sb.append(this.developerDetails, this.developerDetails.length()-3, this.developerDetails.length());
+        sb.append(details.substring(details.length()-3)); //last three letters of developer name
         return sb.toString().toUpperCase();
     }
 
     public String getTaskDetails() {
-        return "TaskClass{" +
-                "taskName='" + taskName + '\'' +
-                ", taskNumber=" + taskNumber +
-                ", taskDescription='" + taskDescription + '\'' +
-                ", developerDetails='" + developerDetails + '\'' +
-                ", taskDuration=" + taskDuration +
-                ", taskID='" + taskID + '\'' +
-                ", taskStatus=" + taskStatus +
-                '}';
+        return "TASK\n" +
+                "Name: " + this.taskName + "\n" +
+                "Number: " + this.taskNumber + "\n" +
+                "Description: \n" + formatDescription() + "\n" +
+                "Developer: " + this.developerDetails + "\n" +
+                "Duration: " + this.taskDuration + "\n" +
+                "ID: " + this.taskID + "\n" +
+                "Status: " + this.taskStatus.describe();
     }
 
     public static int getTotalHours() {
@@ -97,9 +106,56 @@ public class TaskClass {
     }
 
     public static int getFilteredHours(String developerDetails) {
+        //FIXME: can't filter by name due to duplicate names
+        //TODO: be able to filter using mapDetailsNames
         Map<String, Integer> filteredMap = mapDetailsHours.entrySet()
                 .stream().filter(x-> Objects.equals(x.getKey(), developerDetails))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         return filteredMap.values().stream().mapToInt(Integer::intValue).sum();
     }
+
+    private void addHours(String taskID, int duration) {
+        mapDetailsHours.put(taskID, duration);
+    }
+
+    private void addHours() {
+        addHours(this.taskID, this.taskDuration);
+    }
+
+    private void editHours(String taskID, int duration) {
+        mapDetailsHours.replace(taskID, duration);
+    }
+
+    private void addName(String details, String name) {
+        String nameInID = details.substring(details.length()-3).toUpperCase();
+        mapDetailsNames.put(nameInID, name);
+    }
+
+    public void addName(String name) {
+        addName(this.developerDetails, name);
+    }
+
+    private String formatDescription() {
+        return formatDescription(this.taskDescription, 25);
+    }
+
+    private String formatDescription(int maxLineLength) {
+        return formatDescription(this.taskDescription, maxLineLength);
+    }
+
+    private String formatDescription(String DESC, int maxLineLength) {
+        String[] words = DESC.split(" "); // get list of works
+        StringBuilder line = new StringBuilder();
+        StringBuilder result = new StringBuilder();
+        for (String word : words) {
+            if (line.length() + word.length() > maxLineLength) { //add line to result if it full
+                result.append(line).append("\n");
+                line = new StringBuilder(); //reset line is empty
+            }
+            line.append(word).append(" ");
+        }
+        result.append(line);
+        return result.toString();
+    }
+
 }
