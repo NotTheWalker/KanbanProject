@@ -67,7 +67,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library" exported="" scope="TEST">
+    <orderEntry type="module-library" scope="TEST">
       <library name="test">
         <CLASSES />
         <JAVADOC />
@@ -76,5 +76,6 @@
         </SOURCES>
       </library>
     </orderEntry>
+    <orderEntry type="library" name="junit.jupiter" level="project" />
   </component>
 </module>
