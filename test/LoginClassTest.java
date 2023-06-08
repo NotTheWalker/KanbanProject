@@ -12,14 +12,14 @@ class LoginClassTest {
     static Logger logger = Logger.getLogger(LoginClassTest.class.getName());
 
     @ParameterizedTest
-    @CsvFileSource(files = "src/testResources/ValidUsernames.csv")
+    @CsvFileSource(files = "test/testResources/ValidUsernames.csv")
     void checkUserName_withValidUserName(String userName) {
         logger.info("Testing username: "+userName);
         assertTrue(LoginClass.checkUserName(userName));
     }
 
     @ParameterizedTest
-    @CsvFileSource(files = {"src/testResources/InvalidUsernames.csv"})
+    @CsvFileSource(files = {"test/testResources/InvalidUsernames.csv"})
     void checkUserName_withInvalidUserName(String userName) {
         logger.info("Testing username: "+userName);
         assertFalse(LoginClass.checkUserName(userName));
@@ -33,14 +33,14 @@ class LoginClassTest {
     }
 
     @ParameterizedTest
-    @CsvFileSource(files = {"src/testResources/ValidPasswords.csv"})
+    @CsvFileSource(files = {"test/testResources/ValidPasswords.csv"})
     void checkPasswordComplexity_withValidPassword(String password) {
         logger.info("Testing password: "+password);
         assertTrue(LoginClass.checkPasswordComplexity(password));
     }
 
     @ParameterizedTest
-    @CsvFileSource(files = "src/testResources/InvalidPasswords.csv")
+    @CsvFileSource(files = "test/testResources/InvalidPasswords.csv")
     void checkPasswordComplexity_withInvalidPassword(String password) {
         logger.info("Testing password: "+password);
         assertFalse(LoginClass.checkPasswordComplexity(password));
@@ -54,14 +54,14 @@ class LoginClassTest {
     }
 
     @ParameterizedTest
-    @CsvFileSource(files = "src/testResources/EqualUserPairings.csv")
+    @CsvFileSource(files = "test/testResources/EqualUserPairings.csv")
     void loginUser_withEqualPairings(String username1, String password1, String username2, String password2) {
         logger.info("Testing user1: "+username1+" - "+password1+" and user2: "+username2+" - "+password2);
         assertTrue(LoginClass.loginUser(new UserClass(username1, password1), new UserClass(username2, password2)));
     }
 
     @ParameterizedTest
-    @CsvFileSource(files = "src/testResources/UnequalUserPairings.csv")
+    @CsvFileSource(files = "test/testResources/UnequalUserPairings.csv")
     void loginUser_withUnequalPairings(String username1, String password1, String username2, String password2) {
         logger.info("Testing user1: "+username1+" - "+password1+" and user2: "+username2+" - "+password2);
         assertFalse(LoginClass.loginUser(new UserClass(username1, password1), new UserClass(username2, password2)));
