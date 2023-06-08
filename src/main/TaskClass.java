@@ -15,18 +15,59 @@ public class TaskClass {
     private StatusEnum taskStatus;
 
     public TaskClass(String taskName, String taskDescription, String developerDetails, int taskDuration) {
+        taskCount++;
         this.taskName = taskName;
         this.taskNumber = taskCount;
-        taskCount++;
         this.taskDescription = taskDescription;
         this.developerDetails = developerDetails;
         this.taskDuration = taskDuration;
+        mapDetailsHours.put(developerDetails.toUpperCase(), taskDuration);
         this.taskID = createTaskID();
         this.taskStatus = StatusEnum.TO_DO;
     }
 
+    public String getTaskName() {
+        return taskName;
+    }
+
+    public static int getTaskCount() {
+        return taskCount;
+    }
+
+    public static void setTaskCount(int taskCount) {
+        TaskClass.taskCount = taskCount;
+    }
+
+    public int getTaskNumber() {
+        return taskNumber;
+    }
+
+    public String getTaskDescription() {
+        return taskDescription;
+    }
+
+    public String getDeveloperDetails() {
+        return developerDetails;
+    }
+
+    public int getTaskDuration() {
+        return taskDuration;
+    }
+
+    public String getTaskID() {
+        return taskID;
+    }
+
+    public StatusEnum getTaskStatus() {
+        return taskStatus;
+    }
+
+    public void setTaskStatus(StatusEnum taskStatus) {
+        this.taskStatus = taskStatus;
+    }
+
     public boolean checkTaskDescription() {
-        return this.taskDescription.length()>50;
+        return this.taskDescription.length()<=50;
     }
 
     private String createTaskID() {
@@ -60,9 +101,5 @@ public class TaskClass {
                 .stream().filter(x-> Objects.equals(x.getKey(), developerDetails))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         return filteredMap.values().stream().mapToInt(Integer::intValue).sum();
-    }
-
-    public void addDetailsHours() {
-        mapDetailsHours.put(this.developerDetails, this.taskDuration);
     }
 }
