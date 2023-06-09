@@ -116,6 +116,7 @@ public class WorkerClass {
                     }
                 }
                 case 1 -> { //view tasks
+                    message = ""; //clear message
                     //temporary
                     for (TaskClass task : allTasks) {
                         message += task.getTaskDetails();
