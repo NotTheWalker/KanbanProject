@@ -6,6 +6,9 @@ import static java.lang.Long.sum;
 import static javax.swing.JOptionPane.*;
 import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
 
+/**
+ * This class handles the creation of tasks
+ */
 public class TaskHandlerClass {
     static Logger logger = Logger.getLogger(WorkerClass.class.getName());
 
@@ -19,27 +22,44 @@ public class TaskHandlerClass {
     private static boolean goodTask = false;
     private static boolean cancelOperation = false;
 
+    /**
+     * This method sets the provided user, which is used to autopopulate the developer field
+     * @param providedUser The provided user
+     */
     public static void setProvidedUser(UserClass providedUser) {
         TaskHandlerClass.providedUser = providedUser;
     }
 
+    /**
+     * @return The boolean flag for whether the task is valid
+     */
     public static boolean isGoodTask() {
         return goodTask;
     }
 
+    /**
+     * @return The boolean flag for whether the task creation process has been cancelled
+     */
     public static boolean isCancelled() {
         return cancelOperation;
     }
 
+    /**
+     * This method returns the array of all tasks currently known to the program
+     */
     public static TaskClass[] getAllTasks() {
         return allTasks;
     }
 
+    /**
+     * This method is the starting point for the task creation process
+     * It prompts the user for the amount of tasks to add, then loops through the task creation process
+     */
     public static void build() {
         goodTask = false;
         cancelOperation = false;
         int amount = taskAmountPrompt(); //get amount of tasks to add
-        ArrayList<TaskClass> taskList = new ArrayList<>();
+        ArrayList<TaskClass> taskList = new ArrayList<>(); //local list of tasks to add
         for (int i = 0; i < amount; i++) {
             goodTask = false;
             resetFields();
@@ -54,9 +74,9 @@ public class TaskHandlerClass {
                         String developer = developerField.getText();
                         int duration = Integer.parseInt(durationField.getText());
                         TaskClass providedTask = new TaskClass(taskName, taskDescription, developer, duration);
-                        if (isValidTask(providedTask)) {
-                            goodTask = true;
-                            taskList.add(providedTask);
+                        if (isValidTask(providedTask)) { //check if task is valid
+                            goodTask = true; //change flag to true
+                            taskList.add(providedTask); //add task to local list
                             logger.info("Task addition signalled " + sum(i,1) + " of " + amount);
                         } else {
                             showMessageDialog(null, "Task invalid", "Error", ERROR_MESSAGE);
@@ -78,6 +98,11 @@ public class TaskHandlerClass {
         allTasks = taskList.toArray(new TaskClass[0]);
     }
 
+    /**
+     * This method checks if a task is valid
+     * It checks the task name, developer details and task description
+     * @param task The task to check
+     */
     private static boolean isValidTask(TaskClass task){
         boolean taskName = task.checkTaskName();
         boolean developerDetails = task.checkDeveloperDetails();
@@ -85,6 +110,10 @@ public class TaskHandlerClass {
         return taskName && developerDetails && taskDescription;
     }
 
+    /**
+     * This method prompts the user for the amount of tasks to add
+     * @return The amount of tasks to add
+     */
     private static int taskAmountPrompt() { //returns amount of tasks to add
         String defaultMessage = "How many tasks would you like to add?";
         String message = "";
@@ -104,6 +133,11 @@ public class TaskHandlerClass {
         }
     }
 
+    /**
+     * This method prompts the user for task details
+     * It does not check if the task is valid
+     * @return The response code from the user
+     */
     private static int taskPrompt() {
         //asks user for task details
         //does not check if the task is valid
@@ -124,6 +158,11 @@ public class TaskHandlerClass {
         return responseCode;
     }
 
+    /**
+     * This helper method resets the task fields
+     * It uses the provided user to autopopulate the developer field with the provided user's name and surname
+     * It is called after a task has been added, so that the user does not have to manually clear the fields
+     */
     private static void resetFields(){
         taskNameField.setText("");
         taskDescriptionField.setText("");

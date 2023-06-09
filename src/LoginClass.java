@@ -5,6 +5,9 @@ import java.util.regex.Pattern;
 
 import static javax.swing.JOptionPane.*;
 
+/**
+ * This class handles the login and registration of users
+ */
 public class LoginClass {
 
     static Logger logger = Logger.getLogger(LoginClass.class.getName());
@@ -23,22 +26,39 @@ public class LoginClass {
     private static boolean cancelOperation = false;
     private static String response;
 
+    /**
+     * @return the current UserClass object as provided by the user
+     */
     public static UserClass getUser() {
         return providedUser;
     }
-    
+
+    /**
+     * @return The boolean flag for whether the login was successful
+     */
     public static boolean isGoodLogin() {
         return goodLogin;
     }
 
+    /**
+     * @return The boolean flag for whether the registration was successful
+     */
     public static boolean isGoodRegister() {
         return goodRegister;
     }
 
+    /**
+     * @return The boolean flag for whether the login process has been cancelled
+     */
     public static boolean isCancelled() {
         return cancelOperation;
     }
 
+    /**
+     * This method is the starting point for the login process
+     * It prompts the user for their username and password, then loops through the login process
+     * @param allUserClasses The array of all users currently known to the program
+     */
     public static void login(UserClass[] allUserClasses) {
         logger.info("Login initiated");
         goodLogin = false;
@@ -52,7 +72,7 @@ public class LoginClass {
                 logger.info("Login cancellation signalled");
                 return;
             }
-
+            //creates user object from provided username and password to compare with all users
             providedUser = new UserClass(userField.getText(), new String(passwordField.getPassword()));
 
             for(UserClass referenceUser: allUserClasses){
@@ -74,6 +94,10 @@ public class LoginClass {
         }
     }
 
+    /**
+     * This method prompts the user for their username and password
+     * @return The response from the user
+     */
     private static int loginPrompt() {
         userField.setText("");
         passwordField.setText("");
@@ -89,6 +113,10 @@ public class LoginClass {
         return responseCode;
     }
 
+    /**
+     * This method prompts the user for their desired course of action after a failed login
+     * @return The response from the user
+     */
     private static int loginFailure() {
         int responseCode = showOptionDialog(
                 null, response, "Failure",
@@ -97,6 +125,11 @@ public class LoginClass {
         return responseCode;
     }
 
+    /**
+     * This method is the starting point for the registration process
+     * It prompts the user for their desired username and password, then loops through the registration process
+     * If the registration is successful, it prompts the user for their first and last name
+     */
     public static void registerUser() {
         logger.info("Registration initiated");
         goodRegister = false;
@@ -136,6 +169,10 @@ public class LoginClass {
         }
     }
 
+    /**
+     * This method prompts the user for their desired username and password
+     * @return The response from the user
+     */
     private static int registerPrompt() {
         String registerPrompt = "Please enter your username and password";
         Object[] registerMessage = {
@@ -149,6 +186,10 @@ public class LoginClass {
         return responseCode;
     }
 
+    /**
+     * This method prompts the user for their first and last name
+     * @return The response from the user
+     */
     private static int registerDetailsPrompt() {
         String detailsPrompt = "Please enter your first and last name";
         Object[] detailsMessage = {
@@ -162,6 +203,10 @@ public class LoginClass {
         return responseCode;
     }
 
+    /**
+     * This method prompts the user for their desired course of action after a failed registration
+     * @return The response from the user
+     */
     private static int registerFailed() {
         int responseCode = showOptionDialog(
                 null, response, "Registration Failed",
@@ -170,7 +215,12 @@ public class LoginClass {
         return responseCode;
     }
 
-
+    /**
+     * This method checks the username for correct formatting
+     * However, it just creates the String response, it does not return a boolean
+     * @param userClass The user object to be checked
+     * @return The response message from the program
+     */
     public static String returnRegistrationStatus(UserClass userClass) {
         boolean goodUsername = checkUserName(userClass.getUserName());
         boolean goodPassword = checkPasswordComplexity(userClass.getPassword());
@@ -195,10 +245,21 @@ public class LoginClass {
         return response;
     }
 
+    /**
+     * This method is just a wrapper for the equals method in the UserClass
+     * @param providedUserClass The user object provided by the user
+     * @param referenceUserClass The user object to be compared against
+     * @return The result of the comparison
+     */
     public static boolean loginUser(UserClass providedUserClass, UserClass referenceUserClass) { //TODO: Review if this API is necessary
         return providedUserClass.equals(referenceUserClass);
     }
 
+    /**
+     * This method checks if the username and password provided by the user match the username and password of the provided user
+     * However, it just returns the String response, it does not return a boolean
+     * @return The response message from the program, either a welcome message or an error message
+     */
     public static String returnLoginStatus() {
         if(goodLogin) {
             return "Welcome " + providedUser.getFirstName() + " " + providedUser.getLastName() + " it is great to see you again.";
@@ -207,6 +268,11 @@ public class LoginClass {
         }
     }
 
+    /**
+     * This method checks a username for correct formatting
+     * @param userName The username to be checked
+     * @return The result of the check
+     */
     public static boolean checkUserName(String userName){ //checks if the username is valid
         if(userName==null) {return false;}
         boolean lessThan5 = userName.length()<=5;
@@ -214,10 +280,19 @@ public class LoginClass {
         return lessThan5 && containsUnderscore;
     }
 
+    /**
+     * This method checks the class level user's username for correct formatting
+     * @return The result of the check
+     */
     public static boolean checkUserName() {
         return checkUserName(providedUser.getUserName());
     }
 
+    /**
+     * This method checks a password for correct formatting
+     * @param password The password to be checked
+     * @return The result of the check
+     */
     public static boolean checkPasswordComplexity(String password){ //checks if the password is valid
         if(password==null) {return false;}
         Pattern PATTERN_CAPITAL = Pattern.compile("[A-Z]"); //capital letter regex
@@ -233,6 +308,10 @@ public class LoginClass {
         return moreThan8 && containsCapital && containsNumber && containsSpecial;
     }
 
+    /**
+     * This method checks the class level user's password for correct formatting
+     * @return The result of the check
+     */
     public static boolean checkPasswordComplexity() {
         return checkPasswordComplexity(providedUser.getPassword());
     }

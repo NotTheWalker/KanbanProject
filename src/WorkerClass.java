@@ -1,6 +1,5 @@
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -18,6 +17,11 @@ import java.util.logging.Logger;
 
 import static javax.swing.JOptionPane.*;
 
+/**
+ * This class is the main class of the program
+ * It contains a method start() which initializes the control loop
+ * It also contains the methods for reading and writing to the XML file
+ */
 public class WorkerClass {
     static Logger logger = Logger.getLogger(WorkerClass.class.getName());
     public static File USERS_FILE = new File("src/resources/users.xml");
@@ -28,39 +32,45 @@ public class WorkerClass {
 
     private static boolean endProgram = false;
 
+    /**
+     * This is the starting point of the program
+     */
     public static void start() {
 
-        if(USERS_FILE.exists()) { //if the file exists, read from it
+        if (USERS_FILE.exists()) { //if the file exists, read from it
             WorkerClass.allUsers = readUsersFromXML();
         }
 
         while (!endProgram) { //initialise control loop
             entry();
-            if(endProgram) continue;
-            if(!LoginClass.isGoodLogin()) continue;
+            if (endProgram) continue;
+            if (!LoginClass.isGoodLogin()) continue;
             userSession();
         }
 
     }
 
+    /**
+     * This method handles the logging in and registering of users
+     */
     private static void entry() {
-        while(true) {
+        while (true) {
             int returnOption = menuPrompt(); //0 = login, 1 = register, 2 = exit
             switch (returnOption) {
                 case 0 -> { //login
                     LoginClass.login(allUsers);
-                    if (!LoginClass.isCancelled()&&LoginClass.isGoodLogin()) {
+                    if (!LoginClass.isCancelled() && LoginClass.isGoodLogin()) {
                         currentUser = LoginClass.getUser();
                         logger.info("User logged in");
                         return;
-                    } else if(LoginClass.isCancelled()) {
+                    } else if (LoginClass.isCancelled()) {
                         logger.info("Login cancelled");
                         return;
                     }
                 }
                 case 1 -> { //register
                     LoginClass.registerUser();
-                    if (!LoginClass.isCancelled()) {
+                    if (!LoginClass.isCancelled() && LoginClass.isGoodRegister()) {
                         addUser();
                         logger.info("User registered");
                     }
@@ -74,6 +84,11 @@ public class WorkerClass {
         }
     }
 
+    /**
+     * This method displays the login/register menu and returns the user's choice
+     *
+     * @return an integer representing the user's choice
+     */
     private static int menuPrompt() {
         String[] options = {"Login", "Register", "Exit"};
         return showOptionDialog(
@@ -85,6 +100,9 @@ public class WorkerClass {
                 null, options, options[0]);
     }
 
+    /**
+     * This method displays the session menu
+     */
     private static void userSession() {
         TaskHandlerClass.setProvidedUser(currentUser);
         String message = "";
@@ -93,7 +111,7 @@ public class WorkerClass {
             switch (sessionOption) {
                 case 0 -> { //add tasks
                     TaskHandlerClass.build();
-                    if(!TaskHandlerClass.isCancelled()) {
+                    if (!TaskHandlerClass.isCancelled()) {
                         addTasks(TaskHandlerClass.getAllTasks());
                     }
                 }
@@ -118,6 +136,11 @@ public class WorkerClass {
         }
     }
 
+    /**
+     * This method reads all users from the XML file and returns them as an array of UserClass objects
+     *
+     * @return an integer representing the user's choice
+     */
     private static int sessionPrompt() { //returns the option selected
         String[] options = {"Add tasks", "View tasks", "Logout"};
         return showOptionDialog(
@@ -129,14 +152,14 @@ public class WorkerClass {
                 null, options, options[0]);
     }
 
-    public static String[] allUserDetails(UserClass[] allUserClasses){
-        String[] allUserNames = new String[allUserClasses.length];
-        for(int i = 0; i< allUserClasses.length; i++){
-            allUserNames[i] = allUserClasses[i].getFirstName()+" "+ allUserClasses[i].getLastName();
-        }
-        return allUserNames;
-    }
 
+    /**
+     * This method adds a user to an array of UserClass objects
+     *
+     * @param allUsers     an array of UserClass objects
+     * @param incomingUser a UserClass object
+     * @return an array of UserClass objects
+     */
     private static UserClass[] addUser(UserClass[] allUsers, UserClass incomingUser) {
         UserClass[] newAllUsers = new UserClass[allUsers.length + 1];
         System.arraycopy(allUsers, 0, newAllUsers, 0, allUsers.length);
@@ -144,10 +167,20 @@ public class WorkerClass {
         return newAllUsers;
     }
 
+    /**
+     * This method adds a user to the static allUsers array
+     */
     private static void addUser() {
         WorkerClass.allUsers = addUser(WorkerClass.allUsers, LoginClass.getUser());
     }
 
+    /**
+     * This method adds an array of tasks to an array of TaskClass objects
+     *
+     * @param allTasks      an array of TaskClass objects
+     * @param incomingTasks an array of TaskClass objects
+     * @return an array of TaskClass objects
+     */
     private static TaskClass[] addTasks(TaskClass[] allTasks, TaskClass[] incomingTasks) {
         TaskClass[] newAllTasks = new TaskClass[allTasks.length + incomingTasks.length];
         System.arraycopy(allTasks, 0, newAllTasks, 0, allTasks.length);
@@ -155,15 +188,27 @@ public class WorkerClass {
         return newAllTasks;
     }
 
+    /**
+     * This method adds an array of tasks to the static allTasks array
+     *
+     * @param incomingTasks an array of TaskClass objects
+     */
     private static void addTasks(TaskClass[] incomingTasks) {
-        WorkerClass.allTasks = addTasks(allTasks, incomingTasks);
+        WorkerClass.allTasks = addTasks(WorkerClass.allTasks, incomingTasks);
     }
 
+    /**
+     * This method calls the writeUsersToXML method upon exit
+     */
     public static void exit() {
         writeUsersToXML(); //write all users to XML upon exit
     }
 
     //Region XML methods
+
+    /**
+     * This method writes all users to the XML file
+     */
     public static void writeUsersToXML() {
         if (USERS_FILE.exists()) {
             convertToBackup();
@@ -190,24 +235,32 @@ public class WorkerClass {
             DOMSource source = new DOMSource(doc);
 
             StreamResult result = new StreamResult(USERS_FILE);
-            //transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            //transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //FIXME: this breaks the xml reader somehow
             transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-            transformer.setOutputProperty(OutputKeys.ENCODING,"UTF-8");
+            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
             transformer.transform(source, result);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private static void convertToBackup(){
-        File backup = new File("src/resources/users_"+System.currentTimeMillis()+".xml");
+    /**
+     * This method converts the users.xml file to a backup file
+     */
+    private static void convertToBackup() {
+        File backup = new File("src/resources/users_" + System.currentTimeMillis() + ".xml");
         boolean renameStatus = USERS_FILE.renameTo(backup);
         boolean deleteStatus = USERS_FILE.delete();
-        if(renameStatus && deleteStatus) {
+        if (renameStatus && deleteStatus) {
             logger.info("Backup created successfully");
         }
     }
 
+    /**
+     * This method reads all users from the XML file and returns them as an array of UserClass objects
+     *
+     * @return an array of UserClass objects
+     */
     public static UserClass[] readUsersFromXML() {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -222,6 +275,12 @@ public class WorkerClass {
         return new UserClass[0];
     }
 
+    /**
+     * This method retrieves all users from a Document object and returns them as an array of UserClass objects
+     *
+     * @param doc the Document object to retrieve users from
+     * @return an array of UserClass objects
+     */
     private static UserClass[] getAllUsers(Document doc) {
         Element rootElement = doc.getDocumentElement();
         UserClass[] allUserClasses = new UserClass[rootElement.getChildNodes().getLength()];

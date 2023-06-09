@@ -1,6 +1,9 @@
 import java.util.Objects;
 import java.util.logging.Logger;
 
+/**
+ * This is the user object class
+ */
 public class UserClass {
 
     Logger logger = Logger.getLogger(UserClass.class.getName());
@@ -10,20 +13,35 @@ public class UserClass {
     private String firstName = null;
     private String lastName = null;
 
-    public UserClass(String userName, String password, String firstName, String lastName) { //TODO: is this constructor necessary?
+    /**
+     * Constructor for UserClass
+     * @param userName a string containing the username
+     * @param password a string containing the password
+     * @param firstName a string containing the first name
+     * @param lastName a string containing the last name
+     */
+    public UserClass(String userName, String password, String firstName, String lastName) {
         this.userName = userName;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
     }
 
+    /**
+     * Constructor for UserClass
+     * @param userName a string containing the username
+     * @param password a string containing the password
+     */
     public UserClass(String userName, String password) {
         this.userName = userName;
         this.password = password;
     }
 
+    /**
+     * Constructor for UserClass, makes an empty user
+     */
     public UserClass() {
-        //TODO: see above
+
     }
 
     public String getUserName() {//TODO: Username changing/viewing?
