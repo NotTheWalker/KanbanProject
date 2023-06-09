@@ -116,8 +116,9 @@ public class LoginClass {
 
             if(checkUserName() && checkPasswordComplexity()) {
                 goodRegister = true;
+                int registerDetailsCode = registerDetailsPrompt();
 
-                if (registerDetailsPrompt() != 0) {
+                if (registerDetailsCode != 0) {
                     cancelOperation = true;
                     goodRegister = false;
                     logger.info("Registration cancellation signalled at line " + Thread.currentThread().getStackTrace()[1].getLineNumber());

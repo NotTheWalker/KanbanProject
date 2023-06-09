@@ -7,6 +7,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -19,7 +20,7 @@ import static javax.swing.JOptionPane.*;
 
 public class WorkerClass {
     static Logger logger = Logger.getLogger(WorkerClass.class.getName());
-    public static File USERS_FILE = new File("src/main/resources/users.xml");
+    public static File USERS_FILE = new File("src/resources/users.xml");
 
     private static UserClass[] allUsers = new UserClass[0];
     private static UserClass currentUser;
@@ -36,6 +37,7 @@ public class WorkerClass {
         while (!endProgram) { //initialise control loop
             entry();
             if(endProgram) continue;
+            if(!LoginClass.isGoodLogin()) continue;
             userSession();
         }
 
@@ -143,7 +145,7 @@ public class WorkerClass {
     }
 
     private static void addUser() {
-        WorkerClass.allUsers = addUser(allUsers, currentUser);
+        WorkerClass.allUsers = addUser(WorkerClass.allUsers, LoginClass.getUser());
     }
 
     private static TaskClass[] addTasks(TaskClass[] allTasks, TaskClass[] incomingTasks) {
@@ -188,6 +190,9 @@ public class WorkerClass {
             DOMSource source = new DOMSource(doc);
 
             StreamResult result = new StreamResult(USERS_FILE);
+            //transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+            transformer.setOutputProperty(OutputKeys.ENCODING,"UTF-8");
             transformer.transform(source, result);
         } catch (Exception e) {
             e.printStackTrace();
@@ -195,7 +200,7 @@ public class WorkerClass {
     }
 
     private static void convertToBackup(){
-        File backup = new File("src/main/resources/users_"+System.currentTimeMillis()+".xml");
+        File backup = new File("src/resources/users_"+System.currentTimeMillis()+".xml");
         boolean renameStatus = USERS_FILE.renameTo(backup);
         boolean deleteStatus = USERS_FILE.delete();
         if(renameStatus && deleteStatus) {
@@ -207,7 +212,7 @@ public class WorkerClass {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
-            Document doc = builder.parse(USERS_FILE);
+            Document doc = builder.parse(new File("src/resources/users.xml"));
             return getAllUsers(doc);
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
@@ -220,18 +225,17 @@ public class WorkerClass {
     private static UserClass[] getAllUsers(Document doc) {
         Element rootElement = doc.getDocumentElement();
         UserClass[] allUserClasses = new UserClass[rootElement.getChildNodes().getLength()];
-        for (int i = 0; i < rootElement.getChildNodes().getLength(); i++) {
-            Node user = rootElement.getChildNodes().item(i);
-            NamedNodeMap userAttributes = user.getAttributes();
-            Node userNameNode = userAttributes.getNamedItem("userName");
-            String userName = userNameNode.getTextContent();
-            Node passwordNode = userAttributes.getNamedItem("password");
-            String password = passwordNode.getTextContent();
-            Node firstNameNode = userAttributes.getNamedItem("firstName");
-            String firstName = firstNameNode.getTextContent();
-            Node lastNameNode = userAttributes.getNamedItem("lastName");
-            String lastName = lastNameNode.getTextContent();
-            allUserClasses[i] = new UserClass(userName, password, firstName, lastName);
+        int numberOfUsers = rootElement.getChildNodes().getLength();
+        for (int i = 0; i < numberOfUsers; i++) {
+            Node userNode = rootElement.getChildNodes().item(i);
+            if (userNode.getNodeType() == Node.ELEMENT_NODE) {
+                Element userElement = (Element) userNode;
+                String firstName = userElement.getAttribute("firstName");
+                String lastName = userElement.getAttribute("lastName");
+                String userName = userElement.getAttribute("userName");
+                String password = userElement.getAttribute("password");
+                allUserClasses[i] = new UserClass(firstName, lastName, userName, password);
+            }
         }
         return allUserClasses;
     }
