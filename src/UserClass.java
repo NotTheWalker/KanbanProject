@@ -1,29 +1,47 @@
 import java.util.Objects;
 import java.util.logging.Logger;
 
-public class User {
+/**
+ * This is the user object class
+ */
+public class UserClass {
 
-    Logger logger = Logger.getLogger(User.class.getName());
+    Logger logger = Logger.getLogger(UserClass.class.getName());
 
     private String userName;
     private String password;
     private String firstName = null;
     private String lastName = null;
 
-    public User(String userName, String password, String firstName, String lastName) { //TODO: is this constructor necessary?
+    /**
+     * Constructor for UserClass
+     * @param userName a string containing the username
+     * @param password a string containing the password
+     * @param firstName a string containing the first name
+     * @param lastName a string containing the last name
+     */
+    public UserClass(String userName, String password, String firstName, String lastName) {
         this.userName = userName;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
     }
 
-    public User(String userName, String password) {
+    /**
+     * Constructor for UserClass
+     * @param userName a string containing the username
+     * @param password a string containing the password
+     */
+    public UserClass(String userName, String password) {
         this.userName = userName;
         this.password = password;
     }
 
-    public User() {
-        //TODO: see above
+    /**
+     * Constructor for UserClass, makes an empty user
+     */
+    public UserClass() {
+
     }
 
     public String getUserName() {//TODO: Username changing/viewing?
@@ -62,8 +80,8 @@ public class User {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return Objects.equals(userName, user.userName) && Objects.equals(password, user.password);
+        UserClass userClass = (UserClass) o;
+        return Objects.equals(userName, userClass.userName) && Objects.equals(password, userClass.password);
     }
 
     @Override
