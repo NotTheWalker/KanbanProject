@@ -1,3 +1,5 @@
+package main;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -294,7 +296,7 @@ public class WorkerClass {
                 String lastName = userElement.getAttribute("lastName");
                 String userName = userElement.getAttribute("userName");
                 String password = userElement.getAttribute("password");
-                allUserClasses[i] = new UserClass(firstName, lastName, userName, password);
+                allUserClasses[i] = new UserClass(userName, password, firstName, lastName);
             }
         }
         return allUserClasses;

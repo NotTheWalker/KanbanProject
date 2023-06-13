@@ -1,3 +1,5 @@
+package main;
+
 /**
  * Enumerated type for the status of a task.
  */

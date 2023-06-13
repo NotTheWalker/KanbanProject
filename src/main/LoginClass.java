@@ -1,3 +1,5 @@
+package main;
+
 import javax.swing.*;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;

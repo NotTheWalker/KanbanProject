@@ -1,7 +1,7 @@
 <project name="KanbanProject" default="test" basedir=".">
 
     <!-- Define properties -->
-    <property name="src.dir" location="src"/>
+    <property name="src.dir" location="main"/>
     <property name="test.dir" location="test"/>
     <property name="build.dir" location="build"/>
 
