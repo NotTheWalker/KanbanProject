@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.logging.Logger;
 
@@ -12,6 +13,7 @@ public class UserClass {
     private String password;
     private String firstName = null;
     private String lastName = null;
+    private ArrayList<String> taskIds = new ArrayList<>();
 
     /**
      * Constructor for UserClass
@@ -25,6 +27,22 @@ public class UserClass {
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
+    }
+
+    /**
+     * Constructor for UserClass
+     * @param userName a string containing the username
+     * @param password a string containing the password
+     * @param firstName a string containing the first name
+     * @param lastName a string containing the last name
+     * @param taskIds an array of strings containing the task ids
+     */
+    public UserClass(String userName, String password, String firstName, String lastName, ArrayList<String> taskIds) {
+        this.userName = userName;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.taskIds = taskIds;
     }
 
     /**
@@ -74,6 +92,31 @@ public class UserClass {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public ArrayList<String> getTaskIds() {
+        return taskIds;
+    }
+
+    public void setTaskIds(ArrayList<String> taskIds) {
+        this.taskIds = taskIds;
+    }
+
+    public void addTaskId(String taskId) {
+        this.taskIds.add(taskId);
+    }
+
+    public TaskClass[] getTasksByID() {
+        TaskClass[] tasks = new TaskClass[taskIds.size()];
+        for (int i = 0; i < tasks.length; i++) {
+            for(TaskClass task : WorkerClass.getAllTasks()) {
+                if(task.getTaskID().equals(taskIds.get(i))) {
+                    tasks[i] = task;
+                    break;
+                }
+            }
+        }
+        return tasks;
     }
 
     @Override

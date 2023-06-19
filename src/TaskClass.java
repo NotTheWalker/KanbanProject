@@ -37,6 +37,16 @@ public class TaskClass {
         this.taskStatus = StatusEnum.TO_DO;
     }
 
+    public TaskClass(String taskName, int taskNumber, String taskDescription, String developerDetails, int taskDuration, String taskID, StatusEnum taskStatus) {
+        this.taskName = taskName;
+        this.taskNumber = taskNumber;
+        this.taskDescription = taskDescription;
+        this.developerDetails = developerDetails;
+        this.taskDuration = taskDuration;
+        this.taskID = taskID;
+        this.taskStatus = taskStatus;
+    }
+
     public String getTaskName() {
         return taskName;
     }

@@ -75,10 +75,11 @@ public class LoginClass {
             //creates user object from provided username and password to compare with all users
             providedUser = new UserClass(userField.getText(), new String(passwordField.getPassword()));
 
-            for(UserClass referenceUser: allUserClasses){
+            for(UserClass referenceUser: WorkerClass.getAllUsers()){
                 if(loginUser(providedUser, referenceUser)) {
                     providedUser.setFirstName(referenceUser.getFirstName());
                     providedUser.setLastName(referenceUser.getLastName());
+                    providedUser.setTaskIds(referenceUser.getTaskIds());
                     goodLogin = true;
                     logger.info("Login success signalled");
                     break;
@@ -147,7 +148,7 @@ public class LoginClass {
             providedUser = new UserClass(userField.getText(), new String(passwordField.getPassword()));
             response = returnRegistrationStatus(providedUser);
 
-            if(checkUserName() && checkPasswordComplexity()) {
+            if(checkUserName() && checkPasswordComplexity() && checkUserNameDistinct()) {
                 goodRegister = true;
                 int registerDetailsCode = registerDetailsPrompt();
 
@@ -218,12 +219,13 @@ public class LoginClass {
     /**
      * This method checks the username for correct formatting
      * However, it just creates the String response, it does not return a boolean
-     * @param userClass The user object to be checked
+     * @param user The user object to be checked
      * @return The response message from the program
      */
-    public static String returnRegistrationStatus(UserClass userClass) {
-        boolean goodUsername = checkUserName(userClass.getUserName());
-        boolean goodPassword = checkPasswordComplexity(userClass.getPassword());
+    public static String returnRegistrationStatus(UserClass user) {
+        boolean goodUsername = checkUserName(user.getUserName());
+        boolean goodPassword = checkPasswordComplexity(user.getPassword());
+        boolean distinctUsername = checkUserNameDistinct(user.getUserName());
         String response = "";
         if(goodUsername) {
             response += "Username successfully captured";
@@ -242,17 +244,23 @@ public class LoginClass {
                     please ensure that the password contains at least 8 characters,\s
                     a capital letter, a number and a special character.""";
         }
+        response += "\n";
+        if(distinctUsername) {
+            response += "Username is distinct";
+        } else {
+            response += "Username already exists";
+        }
         return response;
     }
 
     /**
      * This method is just a wrapper for the equals method in the UserClass
-     * @param providedUserClass The user object provided by the user
-     * @param referenceUserClass The user object to be compared against
+     * @param providedUser The user object provided by the user
+     * @param referenceUser The user object to be compared against
      * @return The result of the comparison
      */
-    public static boolean loginUser(UserClass providedUserClass, UserClass referenceUserClass) { //TODO: Review if this API is necessary
-        return providedUserClass.equals(referenceUserClass);
+    public static boolean loginUser(UserClass providedUser, UserClass referenceUser) { //TODO: Review if this API is necessary
+        return providedUser.equals(referenceUser);
     }
 
     /**
@@ -288,6 +296,19 @@ public class LoginClass {
         return checkUserName(providedUser.getUserName());
     }
 
+    public static boolean checkUserNameDistinct(String userName) {
+        for(UserClass existingUser : WorkerClass.getAllUsers()) {
+            if(existingUser.getUserName().equals(userName)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    public static boolean checkUserNameDistinct() {
+        return checkUserNameDistinct(providedUser.getUserName());
+    }
+    
     /**
      * This method checks a password for correct formatting
      * @param password The password to be checked

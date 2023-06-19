@@ -15,4 +15,13 @@ public enum StatusEnum {
             case DONE -> "Done";
         };
     }
+
+    public StatusEnum encode(String status) {
+        return switch (status) {
+            case "To Do" -> TO_DO;
+            case "Doing" -> DOING;
+            case "Done" -> DONE;
+            default -> null;
+        };
+    }
 }

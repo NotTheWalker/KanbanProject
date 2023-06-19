@@ -16,7 +16,7 @@ public class TaskHandlerClass {
     private static JTextArea taskDescriptionField = new JTextArea();
     private static JTextField developerField = new JTextField();
     private static JTextField durationField = new JTextField();
-    private static TaskClass[] allTasks = new TaskClass[0];
+    private static TaskClass[] allTasks = new TaskClass[0]; // This is the array of tasks currently being inputted
     private static UserClass providedUser;
 
     private static boolean goodTask = false;
@@ -148,14 +148,26 @@ public class TaskHandlerClass {
                 "Duration:", durationField
         };
         String[] options = {"Add", "Cancel", "Cancel All"}; //0 = add, 1 = cancel, 2 = cancel all
-        int responseCode = showOptionDialog(
-                null,
-                message,
-                "Add task",
-                DEFAULT_OPTION,
-                INFORMATION_MESSAGE,
-                null, options, options[0]);
-        return responseCode;
+        int responseCode;
+        while (true) {
+            responseCode = showOptionDialog(
+                    null,
+                    message,
+                    "Add task",
+                    DEFAULT_OPTION,
+                    INFORMATION_MESSAGE,
+                    null, options, options[0]);
+            try {
+                int hours = Integer.parseInt(durationField.getText());
+                if (hours < 1) { //if the hours are less than 1, ask again
+                    showMessageDialog(null, "Please enter a positive integer", "Error", ERROR_MESSAGE);
+                } else {
+                    return responseCode; //if the hours are valid, return it
+                }
+            } catch (NumberFormatException e) { //if the input is not a number, ask again
+                showMessageDialog(null, "Please enter a positive integer", "Error", ERROR_MESSAGE);
+            }
+        }
     }
 
     /**
