@@ -2,7 +2,7 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
-      <module name="KanbanProject" target="19" />
+      <module name="KanBanProject" target="19" />
     </bytecodeTargetLevel>
   </component>
 </project>

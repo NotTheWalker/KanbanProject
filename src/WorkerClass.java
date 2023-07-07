@@ -232,8 +232,8 @@ public class WorkerClass {
         writeTasksToXML(); //write all tasks to XML upon exit
     }
 
-    //Region XML methods
 
+    //region XML methods
     /**
      * This method writes all users to the XML file
      */
@@ -426,4 +426,5 @@ public class WorkerClass {
         }
         return allTasks;
     }
+    //endregion
 }
